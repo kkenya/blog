@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: create hosted zone
+
+Mappings:
+  ZoneMap:
+    PublicHostedZone:
+      Domain: gekishaman.work
+
+Resources:
+  PublicHostedZone:
+    Type: "AWS::Route53::HostedZone"
+    Properties:
+      HostedZoneConfig:
+        Comment: Public Hosted Zone
+      Name: !FindInMap
+        - ZoneMap
+        - PublicHostedZone
+        - Domain
+      HostedZoneTags:
+        - Key: Type
+          Value: Public Hosted Zone
+
+Outputs:
+  PublicHostedZoneId:
+    Description: Id of Public Hosted Zone
+    Value: !Ref PublicHostedZone
+    Export:
+      Name: !Sub "${AWS::StackName}"
