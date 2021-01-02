@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: create cloudfront
+
+Parameters:
+  S3StackNameParameter:
+    Type: String
+    Description: s3 stack name
+
+Resources:
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: CustomOrigin
+            DomainName: !Sub
+              - '${S3PublicBucketName}.s3-website-${AWS::Region}.amazonaws.com'
+              - S3PublicBucketName:
+                  Fn::ImportValue: !Sub '${S3StackNameParameter}-PublicBucket'
+            CustomOriginConfig:
+              HTTPPort: 80
+              OriginProtocolPolicy: http-only
+        Enabled: true
+        DefaultRootObject: index.html
+        Logging:
+          IncludeCookies: false
+          Bucket: !Sub
+            - '${S3AccesslogBucketName}.s3-${AWS::Region}.amazonaws.com'
+            - S3AccesslogBucketName:
+                Fn::ImportValue: !Sub '${S3StackNameParameter}-AccesslogBucket'
+          Prefix:
+            Fn::ImportValue: !Sub '${S3StackNameParameter}-PublicBucket'
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 300
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        Comment: !Sub '${S3StackNameParameter}-distribution'
+        DefaultCacheBehavior:
+          TargetOriginId: CustomOrigin
+          ForwardedValues:
+            QueryString: false
+          DefaultTTL: 300
+          MaxTTL: 300
+          MinTTL: 300
+          ViewerProtocolPolicy: redirect-to-https
+        # Todo: ssl設定後有効化
+        #Aliases:
+        #- gekishaman.work
+        #ViewerCertificate:
+        #  SslSupportMethod: sni-only
+        #  AcmCertificateArn: arn:aws:acm:us-east-1:000000000000:certificate/dummy-example-com
+      Tags:
+        - Key: CloudFormationArn
+          Value: !Sub '${S3StackNameParameter}-Cloudfront'
+
+Outputs:
+  CloudFrontDistributionId:
+    Description: cloud front distribution id
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: !Sub '${S3StackNameParameter}-CloudFront'

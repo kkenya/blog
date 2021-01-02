@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 
 Description: create hosted zone
 
@@ -9,7 +9,7 @@ Mappings:
 
 Resources:
   PublicHostedZone:
-    Type: "AWS::Route53::HostedZone"
+    Type: 'AWS::Route53::HostedZone'
     Properties:
       HostedZoneConfig:
         Comment: Public Hosted Zone
@@ -23,7 +23,7 @@ Resources:
 
 Outputs:
   PublicHostedZoneId:
-    Description: Id of Public Hosted Zone
+    Description: Hosted Zone Id
     Value: !Ref PublicHostedZone
     Export:
-      Name: !Sub "${AWS::StackName}"
+      Name: !Sub '${AWS::StackName}-HostedZone'
