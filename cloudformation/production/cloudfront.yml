@@ -26,7 +26,7 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub
-            - '${S3AccesslogBucketName}.s3-${AWS::Region}.amazonaws.com'
+            - '${S3AccesslogBucketName}.s3.${AWS::Region}.amazonaws.com'
             - S3AccesslogBucketName:
                 Fn::ImportValue: !Sub '${S3StackNameParameter}-AccesslogBucket'
           Prefix:
