@@ -32,15 +32,14 @@ Resources:
         Comment: Public Hosted Zone
       Name: !FindInMap [ZoneMap, PublicHostedZone, Name]
       HostedZoneTags:
-        - Key: Type
-          Value: Public Hosted Zone
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-hosted-zone'
 
   CertificateValidationRecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
       Comment: ACM certificate validation cname record set
-      HostedZoneId:
-        Fn::ImportValue: BlogHostedZoneId
+      HostedZoneId: !ImportValue BlogHostedZoneId
       Name: !Ref CertificateValidationRecordSetName
       ResourceRecords:
         - !Ref CertificateValidationRecordSetValue
