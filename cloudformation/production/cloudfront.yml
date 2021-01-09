@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: create cloudfront
+
+Parameters:
+  AcmCertificateArn:
+    Type: String
+    Description: ACM certificate ARN(Amazon Resource Name)
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: CloudFront Configuration
+        Parameters:
+          - AcmCertificateArn
+
+Resources:
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: CustomOrigin
+            DomainName: !Sub
+              - '${BlogPublicBucketName}.s3-website-${AWS::Region}.amazonaws.com'
+              - BlogPublicBucketName: !ImportValue BlogPublicBucketName
+            CustomOriginConfig:
+              HTTPPort: 80
+              OriginProtocolPolicy: http-only
+        Enabled: true
+        DefaultRootObject: index.html
+        Logging:
+          IncludeCookies: false
+          Bucket: !Sub
+            - '${BlogAccesslogBucketName}.s3.${AWS::Region}.amazonaws.com'
+            - BlogAccesslogBucketName: !ImportValue BlogAccesslogBucketName
+          Prefix: !ImportValue BlogPublicBucketName
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 300
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        Comment: 'blog s3 distribution'
+        DefaultCacheBehavior:
+          TargetOriginId: CustomOrigin
+          ForwardedValues:
+            QueryString: false
+          DefaultTTL: 300
+          MaxTTL: 300
+          MinTTL: 300
+          ViewerProtocolPolicy: redirect-to-https
+        Aliases:
+          - !ImportValue BlogHostedZoneName
+        ViewerCertificate:
+          SslSupportMethod: sni-only
+          AcmCertificateArn: !Ref AcmCertificateArn
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-cloudfront'
+
+  CloudFrontRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+      Comment: cloud front record set
+      HostedZoneId: !ImportValue BlogHostedZoneId
+      Name: !ImportValue BlogHostedZoneName
+      Type: A
+
+Outputs:
+  CloudFrontDistributionId:
+    Description: cloud front distribution id
+    Value: !Ref CloudFrontDistribution
+    Export:
+      Name: BlogCloudFrontId

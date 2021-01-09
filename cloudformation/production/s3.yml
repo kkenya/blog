@@ -1,0 +1,87 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: create s3 bucket
+
+Resources:
+  S3BucketPublic:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !ImportValue BlogHostedZoneName
+      LifecycleConfiguration:
+        Rules:
+          - Id: NoncurrentVersionExpiration
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 3
+      LoggingConfiguration:
+        DestinationBucketName: !Ref S3BucketAccesslogs
+        LogFilePrefix: !Sub 's3/${AWS::StackName}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: false
+      VersioningConfiguration:
+        Status: Enabled
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: 404.html
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-bucket'
+
+  S3BucketAccesslogs:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketName: !Sub '${AWS::StackName}-accesslogs-${AWS::Region}-${AWS::AccountId}'
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: AutoDelete
+            Status: Enabled
+            ExpirationInDays: 30
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-accesslog-bucket'
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3BucketPublic
+      PolicyDocument:
+        Id: !Sub '${AWS::StackName}-BucketPolicy'
+        Statement:
+          - Sid: AddPerm
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - s3:GetObject
+            Resource:
+              - !Sub 'arn:aws:s3:::${S3BucketPublic}/*'
+            Condition:
+              StringEquals:
+                aws:UserAgent: Amazon CloudFront
+
+Outputs:
+  PublicBucketName:
+    Description: s3 public bucket name
+    Value: !Ref S3BucketPublic
+    Export:
+      Name: BlogPublicBucketName
+  AccesslogBucketName:
+    Description: s3 accesslog bucket name
+    Value: !Ref S3BucketAccesslogs
+    Export:
+      Name: BlogAccesslogBucketName
