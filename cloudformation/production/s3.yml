@@ -5,7 +5,7 @@ Description: create s3 bucket
 Mappings:
   ZoneMap:
     PublicHostedZone:
-      Domain: gekishaman.work
+      Name: gekishaman.work
 
 Resources:
   S3BucketPublic:
@@ -13,10 +13,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !FindInMap
-        - ZoneMap
-        - PublicHostedZone
-        - Domain
+      BucketName: !FindInMap ["ZoneMap", "PublicHostedZone", "Name"]
       LifecycleConfiguration:
         Rules:
           - Id: NoncurrentVersionExpiration
@@ -81,19 +78,6 @@ Resources:
             Condition:
               StringEquals:
                 aws:UserAgent: Amazon CloudFront
-          - Sid: AddPerm
-            Effect: Allow
-            Principal: '*'
-            Action:
-              - s3:GetObject
-            Resource:
-              - !Sub 'arn:aws:s3:::${S3BucketPublic}/*'
-            Condition:
-              IpAddress:
-                aws:SourceIp:
-                  - 127.0.0.1/32
-                  #- 0.0.0.0/0
-                  #- ::/0
 
 Outputs:
   PublicBucketName:
