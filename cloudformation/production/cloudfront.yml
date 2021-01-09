@@ -7,11 +7,18 @@ Parameters:
     Type: String
     Description: s3 stack name
 
+Mappings:
+  ZoneMap:
+    PublicHostedZone:
+      Name: gekishaman.work.
+
 Resources:
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        Aliases:
+          - !FindInMap ["ZoneMap", "PublicHostedZone", "Name"]
         Origins:
           - Id: CustomOrigin
             DomainName: !Sub
@@ -61,3 +68,8 @@ Outputs:
     Value: !Ref CloudFrontDistribution
     Export:
       Name: !Sub '${S3StackNameParameter}-CloudFront'
+  CloudFrontDomainName:
+    Description: cloud front domain name
+    Value: !GetAtt  CloudFrontDistribution.DomainName
+    Export:
+      Name: !Sub '${S3StackNameParameter}-CloudFrontDomainName'

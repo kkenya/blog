@@ -5,7 +5,7 @@ Description: create hosted zone
 Mappings:
   ZoneMap:
     PublicHostedZone:
-      Domain: gekishaman.work
+      Name: gekishaman.work.
 
 Resources:
   PublicHostedZone:
@@ -13,10 +13,7 @@ Resources:
     Properties:
       HostedZoneConfig:
         Comment: Public Hosted Zone
-      Name: !FindInMap
-        - ZoneMap
-        - PublicHostedZone
-        - Domain
+      Name: !FindInMap ["ZoneMap", "PublicHostedZone", "Name"]
       HostedZoneTags:
         - Key: Type
           Value: Public Hosted Zone
