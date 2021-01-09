@@ -2,6 +2,23 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Description: create hosted zone
 
+Parameters:
+  CertificateValidationRecordSetName:
+    Type: String
+    Description: cname record set's name for dns validation on ACM certificate
+  CertificateValidationRecordSetValue:
+    Type: String
+    Description: cname record set's value for dns validation on ACM certificate
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: ACM Configuration
+        Parameters:
+          - CertificateValidationRecordSetName
+          - CertificateValidationRecordSetValue
+
 Mappings:
   ZoneMap:
     PublicHostedZone:
@@ -17,6 +34,18 @@ Resources:
       HostedZoneTags:
         - Key: Type
           Value: Public Hosted Zone
+
+  CertificateValidationRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: ACM certificate validation cname record set
+      HostedZoneId:
+        Fn::ImportValue: BlogHostedZoneId
+      Name: !Ref CertificateValidationRecordSetName
+      ResourceRecords:
+        - !Ref CertificateValidationRecordSetValue
+      Type: CNAME
+      TTL: 300
 
 Outputs:
   PublicHostedZoneId:

@@ -1,0 +1,24 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+# CloudFrontの証明書はus-east-1で発行する必要があるためクロススタックは利用できない
+Description: |
+  create ACM certificate for cloudFront
+
+Mappings:
+  ZoneMap:
+    PublicHostedZone:
+      Name: gekishaman.work
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !FindInMap [ZoneMap, PublicHostedZone, Name]
+      SubjectAlternativeNames:
+        - !Sub
+          - '*.${DomainName}'
+          - DomainName: !FindInMap [ZoneMap, PublicHostedZone, Name]
+      Tags:
+        - Key: Name
+          Value: !FindInMap [ZoneMap, PublicHostedZone, Name]
+      ValidationMethod: DNS
