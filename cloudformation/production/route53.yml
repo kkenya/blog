@@ -13,7 +13,7 @@ Resources:
     Properties:
       HostedZoneConfig:
         Comment: Public Hosted Zone
-      Name: !FindInMap ["ZoneMap", "PublicHostedZone", "Name"]
+      Name: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
       HostedZoneTags:
         - Key: Type
           Value: Public Hosted Zone
@@ -24,3 +24,8 @@ Outputs:
     Value: !Ref PublicHostedZone
     Export:
       Name: !Sub '${AWS::StackName}-HostedZone'
+  PublicHostedZoneName:
+    Description: hosted zone name
+    Value: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
+    Export:
+      Name: !Sub '${AWS::StackName}-HostedZoneName'
