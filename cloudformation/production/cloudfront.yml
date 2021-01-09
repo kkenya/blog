@@ -3,28 +3,28 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: create cloudfront
 
 Parameters:
-  S3StackNameParameter:
+  AcmCertificateArn:
     Type: String
-    Description: s3 stack name
+    Description: ACM certificate ARN(Amazon Resource Name)
 
-Mappings:
-  ZoneMap:
-    PublicHostedZone:
-      Name: gekishaman.work.
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: CloudFront Configuration
+        Parameters:
+          - AcmCertificateArn
 
 Resources:
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        Aliases:
-          - !FindInMap ["ZoneMap", "PublicHostedZone", "Name"]
         Origins:
           - Id: CustomOrigin
             DomainName: !Sub
-              - '${S3PublicBucketName}.s3-website-${AWS::Region}.amazonaws.com'
-              - S3PublicBucketName:
-                  Fn::ImportValue: !Sub '${S3StackNameParameter}-PublicBucket'
+              - '${BlogPublicBucketName}.s3-website-${AWS::Region}.amazonaws.com'
+              - BlogPublicBucketName: !ImportValue BlogPublicBucketName
             CustomOriginConfig:
               HTTPPort: 80
               OriginProtocolPolicy: http-only
@@ -33,17 +33,15 @@ Resources:
         Logging:
           IncludeCookies: false
           Bucket: !Sub
-            - '${S3AccesslogBucketName}.s3.${AWS::Region}.amazonaws.com'
-            - S3AccesslogBucketName:
-                Fn::ImportValue: !Sub '${S3StackNameParameter}-AccesslogBucket'
-          Prefix:
-            Fn::ImportValue: !Sub '${S3StackNameParameter}-PublicBucket'
+            - '${BlogAccesslogBucketName}.s3.${AWS::Region}.amazonaws.com'
+            - BlogAccesslogBucketName: !ImportValue BlogAccesslogBucketName
+          Prefix: !ImportValue BlogPublicBucketName
         CustomErrorResponses:
           - ErrorCachingMinTTL: 300
             ErrorCode: 403
             ResponseCode: 200
             ResponsePagePath: /index.html
-        Comment: !Sub '${S3StackNameParameter}-distribution'
+        Comment: 'blog s3 distribution'
         DefaultCacheBehavior:
           TargetOriginId: CustomOrigin
           ForwardedValues:
@@ -52,24 +50,29 @@ Resources:
           MaxTTL: 300
           MinTTL: 300
           ViewerProtocolPolicy: redirect-to-https
-        # Todo: ssl設定後有効化
-        #Aliases:
-        #- gekishaman.work
-        #ViewerCertificate:
-        #  SslSupportMethod: sni-only
-        #  AcmCertificateArn: arn:aws:acm:us-east-1:000000000000:certificate/dummy-example-com
+        Aliases:
+          - !ImportValue BlogHostedZoneName
+        ViewerCertificate:
+          SslSupportMethod: sni-only
+          AcmCertificateArn: !Ref AcmCertificateArn
       Tags:
-        - Key: CloudFormationArn
-          Value: !Sub '${S3StackNameParameter}-Cloudfront'
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-cloudfront'
+
+  CloudFrontRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+      Comment: cloud front record set
+      HostedZoneId: !ImportValue BlogHostedZoneId
+      Name: !ImportValue BlogHostedZoneName
+      Type: A
 
 Outputs:
   CloudFrontDistributionId:
     Description: cloud front distribution id
     Value: !Ref CloudFrontDistribution
     Export:
-      Name: !Sub '${S3StackNameParameter}-CloudFront'
-  CloudFrontDomainName:
-    Description: cloud front domain name
-    Value: !GetAtt  CloudFrontDistribution.DomainName
-    Export:
-      Name: !Sub '${S3StackNameParameter}-CloudFrontDomainName'
+      Name: BlogCloudFrontId
