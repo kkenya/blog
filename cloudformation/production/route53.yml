@@ -5,7 +5,7 @@ Description: create hosted zone
 Mappings:
   ZoneMap:
     PublicHostedZone:
-      Name: gekishaman.work.
+      Name: gekishaman.work
 
 Resources:
   PublicHostedZone:
@@ -13,7 +13,7 @@ Resources:
     Properties:
       HostedZoneConfig:
         Comment: Public Hosted Zone
-      Name: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
+      Name: !FindInMap [ZoneMap, PublicHostedZone, Name]
       HostedZoneTags:
         - Key: Type
           Value: Public Hosted Zone
@@ -23,9 +23,9 @@ Outputs:
     Description: Hosted Zone Id
     Value: !Ref PublicHostedZone
     Export:
-      Name: !Sub '${AWS::StackName}-HostedZone'
+      Name: BlogHostedZoneId
   PublicHostedZoneName:
     Description: hosted zone name
-    Value: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
+    Value: !FindInMap [ZoneMap, PublicHostedZone, Name]
     Export:
-      Name: !Sub '${AWS::StackName}-HostedZoneName'
+      Name: BlogHostedZoneName
