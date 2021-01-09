@@ -1,11 +1,6 @@
-AWSTemplateFormatVersion: 2010-09-09
+AWSTemplateFormatVersion: '2010-09-09'
 
 Description: create s3 bucket
-
-Mappings:
-  ZoneMap:
-    PublicHostedZone:
-      Name: gekishaman.work
 
 Resources:
   S3BucketPublic:
@@ -13,14 +8,14 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !FindInMap ["ZoneMap", "PublicHostedZone", "Name"]
+      BucketName: !ImportValue BlogHostedZoneName
       LifecycleConfiguration:
         Rules:
           - Id: NoncurrentVersionExpiration
             Status: Enabled
             NoncurrentVersionExpirationInDays: 3
       LoggingConfiguration:
-        DestinationBucketName: !Ref 'S3BucketAccesslogs'
+        DestinationBucketName: !Ref S3BucketAccesslogs
         LogFilePrefix: !Sub 's3/${AWS::StackName}'
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
@@ -33,8 +28,8 @@ Resources:
         IndexDocument: index.html
         ErrorDocument: 404.html
       Tags:
-        - Key: CloudFormationArn
-          Value: !Sub '${AWS::StackName}'
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-bucket'
 
   S3BucketAccesslogs:
     Type: AWS::S3::Bucket
@@ -58,13 +53,13 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
       Tags:
-        - Key: CloudFormationArn
-          Value: !Sub '${AWS::StackName}'
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-accesslog-bucket'
 
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref 'S3BucketPublic'
+      Bucket: !Ref S3BucketPublic
       PolicyDocument:
         Id: !Sub '${AWS::StackName}-BucketPolicy'
         Statement:
@@ -84,9 +79,9 @@ Outputs:
     Description: s3 public bucket name
     Value: !Ref S3BucketPublic
     Export:
-      Name: !Sub '${AWS::StackName}-PublicBucket'
+      Name: BlogPublicBucketName
   AccesslogBucketName:
     Description: s3 accesslog bucket name
     Value: !Ref S3BucketAccesslogs
     Export:
-      Name: !Sub '${AWS::StackName}-AccesslogBucket'
+      Name: BlogAccesslogBucketName
