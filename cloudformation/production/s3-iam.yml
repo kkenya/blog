@@ -1,19 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: create IAM role
-
 Parameters:
-  S3StackNameParameter:
-    Type: String
-    Description: s3 stack name
   IamUserArn:
     Description: IAM user ARN (S3 access)
     Type: String
-    Default: arn:aws:iam::000000000000:user/dummy
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: S3 Configuration
+        Parameters:
+          - IamUserArn
+
 Conditions:
   IsS3RoleEnable: !Not
     - !Equals
-      - !Ref 'IamUserArn'
+      - !Ref IamUserArn
       - arn:aws:iam::000000000000:user/dummy
 
 Resources:
@@ -21,13 +24,13 @@ Resources:
     Condition: IsS3RoleEnable
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub 'iam-role-${S3StackNameParameter}'
+      RoleName: !Sub 'iam-role-${AWS::StackName}'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
-              AWS: !Ref 'IamUserArn'
+              AWS: !Ref IamUserArn
             Action: sts:AssumeRole
             Condition:
               Bool:
@@ -53,12 +56,10 @@ Resources:
                 Resource:
                   - !Sub
                     - 'arn:aws:s3:::${S3BucketName}/*'
-                    - S3BucketName:
-                        Fn::ImportValue: !Sub '${S3StackNameParameter}-PublicBucket'
+                    - S3BucketName: !ImportValue  BlogPublicBucketName
                   - !Sub
                     - 'arn:aws:s3:::${S3BucketName}'
-                    - S3BucketName:
-                        Fn::ImportValue: !Sub '${S3StackNameParameter}-PublicBucket'
+                    - S3BucketName: !ImportValue BlogAccesslogBucketName
               - Effect: Deny
                 Action:
                   - s3:PutBucket*
@@ -80,5 +81,4 @@ Resources:
                 Resource:
                   - !Sub
                     - 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistributionId}'
-                    - CloudFrontDistributionId:
-                        Fn::ImportValue: !Sub '${S3StackNameParameter}-CloudFront'
+                    - CloudFrontDistributionId: !ImportValue BlogCloudFrontId
