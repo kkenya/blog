@@ -64,7 +64,7 @@ Resources:
       Source:
         BuildSpec: !Ref BuildSpecFile
         BuildStatusConfig:
-          Context: ci-test
+          Context: Run test
           # TargetUrl: this build url
         Location: !Ref GitHubRepositoryUrl
         ReportBuildStatus: true
