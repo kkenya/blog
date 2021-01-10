@@ -1,5 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
+Description: create s3 IAM Role
+
 Parameters:
   IamUserArn:
     Description: IAM user ARN (S3 access)

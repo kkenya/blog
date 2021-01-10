@@ -8,7 +8,6 @@ phases:
       - npm ci
   pre_build:
     commands:
-      - echo Nothing to do in the pre_build phase...
       - npm test
   build:
     commands:
@@ -16,6 +15,3 @@ phases:
   post_build:
     commands:
       - echo Build completed on `date`
-# artifacts:
-#   files:
-#     - target/messageUtil-1.0.jar
