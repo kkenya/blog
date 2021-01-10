@@ -2,9 +2,9 @@
   "name": "blog",
   "version": "1.0.0",
   "description": "aws hosting",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"no test\""
+    "test": "echo \"no test\" && exit 1"
   },
   "repository": {
     "type": "git",
