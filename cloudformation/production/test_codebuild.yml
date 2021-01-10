@@ -106,14 +106,11 @@ Resources:
         Version: '2012-10-17'
         Statement:
           - Resource: !Sub
-              - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${GroupName}:log-stream:${StreamName}*'
+              - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${GroupName}:log-stream*'
               - GroupName: !Sub
                   - '${Env}.${ServiceName}'
                   - Env: !FindInMap [EnvironmentMap, Production, Name]
                     ServiceName: !FindInMap [ServiceMap, Blog, Name]
-                StreamName: !Sub
-                  - '${ServiceName}TestLog'
-                  - ServiceName: !FindInMap [ServiceMap, Blog, Name]
             Effect: Allow
             Action:
               - logs:CreateLogGroup
