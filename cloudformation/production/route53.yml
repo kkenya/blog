@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: create hosted zone
+Description: create hosted zone and record set
 
 Parameters:
   CertificateValidationRecordSetName:
