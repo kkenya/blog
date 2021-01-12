@@ -99,7 +99,9 @@ Resources:
   BlogTestCodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: BlogTestCodeBuildRole
+      RoleName: !Sub
+        - '${ServiceName}TestCodeBuildRole'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -112,7 +114,9 @@ Resources:
   BlogTestCodeBUildPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: BlogTestCodeBUildPolicy
+      PolicyName: !Sub
+        - '${ServiceName}TestCodeBUildPolicy'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
       PolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -151,7 +155,9 @@ Resources:
   BlogTestChatbot:
     Type: AWS::Chatbot::SlackChannelConfiguration
     Properties:
-      ConfigurationName: BlogTestChatbot
+      ConfigurationName: !Sub
+        - '${ServiceName}TestChatbot'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
       IamRoleArn: !GetAtt BlogTestChatbotRole.Arn
       LoggingLevel: ERROR
       SlackChannelId: !Ref SlackChannelId
@@ -160,7 +166,9 @@ Resources:
   BlogTestChatbotRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: BlogTestChatbotRole
+      RoleName: !Sub
+        - '${ServiceName}TestChatbotRole'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
@@ -188,7 +196,9 @@ Resources:
       EventTypeIds:
         - codebuild-project-build-state-failed
         - codebuild-project-build-state-succeeded
-      Name: BlogTestNotification
+      Name: !Sub
+        - '${ServiceName}TestNotificationRule'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
       Resource: !GetAtt BlogTestCodeBuildProject.Arn
       Status: ENABLED
       # Tags: Json # json only
