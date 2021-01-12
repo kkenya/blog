@@ -28,7 +28,7 @@ Resources:
     Properties:
       RoleName: !Sub 'iam-role-${AWS::StackName}'
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Effect: Allow
             Principal:
@@ -44,7 +44,7 @@ Resources:
       Policies:
         - PolicyName: S3accessPolicy
           PolicyDocument:
-            Version: '2012-10-17'
+            Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:

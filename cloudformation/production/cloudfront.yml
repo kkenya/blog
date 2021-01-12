@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: create cloudfront
+Description: create cloudfront with domain and record set
 
 Parameters:
   AcmCertificateArn:
