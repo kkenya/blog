@@ -9,6 +9,12 @@ Parameters:
   BuildSpecFile:
     Type: String
     Description: buildSpec directory
+  SlackChannelId:
+    Type: String
+    Description: slack channel id for notification
+  ChatbotWorkspaceId:
+    Type: String
+    Description: Chatbot workspace id authorized from slack
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -18,6 +24,11 @@ Metadata:
         Parameters:
           - GitHubRepositoryUrl
           - BuildSpecFile
+      - Label:
+          default: Chatbogt Configuration
+        Parameters:
+          - SlackChannelId
+          - ChatbotWorkspaceId
 
 Mappings:
   ServiceMap:
@@ -28,7 +39,7 @@ Mappings:
       Name: production
 
 Resources:
-  TestCodeBuildProject:
+  BlogTestCodeBuildProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
@@ -57,10 +68,10 @@ Resources:
             - ServiceName: !FindInMap [ServiceMap, Blog, Name]
           Status: ENABLED
       Name: !Sub
-        - '${ServiceName}TestCodeBuild'
+        - '${ServiceName}Test' # ChatBot display name
         - ServiceName: !FindInMap [ServiceMap, Blog, Name]
       QueuedTimeoutInMinutes: 10
-      ServiceRole: !Ref CodeBuildTestRole
+      ServiceRole: !Ref BlogTestCodeBuildRole
       Source:
         BuildSpec: !Ref BuildSpecFile
         BuildStatusConfig:
@@ -69,7 +80,7 @@ Resources:
         Location: !Ref GitHubRepositoryUrl
         ReportBuildStatus: true
         SourceIdentifier: !Sub
-          - '${ServiceName}TestCodeBuild'
+          - '${ServiceName}GitHubRepository'
           - ServiceName: !FindInMap [ServiceMap, Blog, Name]
         Type: GITHUB
       Tags:
@@ -85,12 +96,12 @@ Resources:
               Type: EVENT
         Webhook: true
 
-  CodeBuildTestRole:
+  BlogTestCodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CodeBuildTestRole
+      RoleName: BlogTestCodeBuildRole
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Effect: 'Allow'
             Principal:
@@ -98,12 +109,12 @@ Resources:
             Action: 'sts:AssumeRole'
       Path: '/'
 
-  CodeBuildTestPolicy:
+  BlogTestCodeBUildPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: CodeBuildTestPolicy
+      PolicyName: BlogTestCodeBUildPolicy
       PolicyDocument:
-        Version: '2012-10-17'
+        Version: 2012-10-17
         Statement:
           - Resource: !Sub
               - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${GroupName}:log-stream*'
@@ -135,4 +146,52 @@ Resources:
               - codebuild:BatchPutTestCases
               - codebuild:BatchPutCodeCoverages
       Roles:
-        - !Ref CodeBuildTestRole
+        - !Ref BlogTestCodeBuildRole
+
+  BlogTestChatbot:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: BlogTestChatbot
+      IamRoleArn: !GetAtt BlogTestChatbotRole.Arn
+      LoggingLevel: ERROR
+      SlackChannelId: !Ref SlackChannelId
+      SlackWorkspaceId: !Ref ChatbotWorkspaceId
+
+  BlogTestChatbotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: BlogTestChatbotRole
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: chatbot.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ChatbotNotificationOnlyPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:Describe*
+                  - cloudwatch:Get*
+                  - cloudwatch:List*
+                Resource:
+                  - '*'
+
+  BlogTestNotificationRule:
+    Type: AWS::CodeStarNotifications::NotificationRule
+    Properties:
+      DetailType: FULL
+      EventTypeIds:
+        - codebuild-project-build-state-failed
+        - codebuild-project-build-state-succeeded
+      Name: BlogTestNotification
+      Resource: !GetAtt BlogTestCodeBuildProject.Arn
+      Status: ENABLED
+      # Tags: Json # json only
+      Targets:
+        - TargetAddress: !Ref BlogTestChatbot
+          TargetType: AWSChatbotSlack
