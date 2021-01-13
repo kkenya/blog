@@ -4,7 +4,8 @@
   "description": "aws hosting",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"no test\""
+    "test": "echo \"no test\"",
+    "lint:text": "npx textlint 'docs/*'"
   },
   "repository": {
     "type": "git",
@@ -16,5 +17,11 @@
   "bugs": {
     "url": "https://github.com/kkenya/blog/issues"
   },
-  "homepage": "https://github.com/kkenya/blog#readme"
+  "homepage": "https://github.com/kkenya/blog#readme",
+  "devDependencies": {
+    "textlint": "^11.7.7",
+    "textlint-rule-preset-ja-spacing": "^2.0.2",
+    "textlint-rule-preset-ja-technical-writing": "^4.0.1",
+    "textlint-rule-spellcheck-tech-word": "^5.0.0"
+  }
 }
