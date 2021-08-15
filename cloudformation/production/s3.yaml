@@ -56,30 +56,12 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-accesslog-bucket'
 
-  S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3BucketPublic
-      PolicyDocument:
-        Id: !Sub '${AWS::StackName}-BucketPolicy'
-        Statement:
-          - Sid: AddPerm
-            Effect: Allow
-            Principal: '*'
-            Action:
-              - s3:GetObject
-            Resource:
-              - !Sub 'arn:aws:s3:::${S3BucketPublic}/*'
-            Condition:
-              StringEquals:
-                aws:UserAgent: Amazon CloudFront
-
 Outputs:
   PublicBucketName:
     Description: s3 public bucket name
     Value: !Ref S3BucketPublic
     Export:
-      Name: BlogPublicBucketName
+      Name: BlogBucketName
   AccesslogBucketName:
     Description: s3 accesslog bucket name
     Value: !Ref S3BucketAccesslogs

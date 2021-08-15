@@ -23,6 +23,9 @@ Mappings:
   ZoneMap:
     PublicHostedZone:
       Name: gekishaman.work
+  SiteMap:
+    Blog:
+      Name: blog
 
 Resources:
   PublicHostedZone:
@@ -39,19 +42,31 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       Comment: ACM certificate validation cname record set
-      HostedZoneId: !ImportValue BlogHostedZoneId
+      HostedZoneId: !Ref PublicHostedZone
       Name: !Ref CertificateValidationRecordSetName
       ResourceRecords:
         - !Ref CertificateValidationRecordSetValue
       Type: CNAME
       TTL: 300
 
+  BlogRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !Sub
+          - '${Site}.${HostedZone}'
+          - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+            HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
+        HostedZoneId: Z2FDTNDATAQYW2
+      Comment: blog record set
+      HostedZoneId: !Ref PublicHostedZone
+      Name: !Sub
+        - '${Site}.${HostedZone}'
+        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+          HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
+      Type: A
+
 Outputs:
-  PublicHostedZoneId:
-    Description: Hosted Zone Id
-    Value: !Ref PublicHostedZone
-    Export:
-      Name: BlogHostedZoneId
   PublicHostedZoneName:
     Description: hosted zone name
     Value: !FindInMap [ZoneMap, PublicHostedZone, Name]

@@ -15,6 +15,14 @@ Metadata:
         Parameters:
           - AcmCertificateArn
 
+Mappings:
+  ZoneMap:
+    PublicHostedZone:
+      Name: gekishaman.work
+  SiteMap:
+    Blog:
+      Name: blog
+
 Resources:
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -23,8 +31,8 @@ Resources:
         Origins:
           - Id: CustomOrigin
             DomainName: !Sub
-              - '${BlogPublicBucketName}.s3-website-${AWS::Region}.amazonaws.com'
-              - BlogPublicBucketName: !ImportValue BlogPublicBucketName
+              - '${BlogBucketName}.s3-website-${AWS::Region}.amazonaws.com'
+              - BlogBucketName: !ImportValue BlogBucketName
             CustomOriginConfig:
               HTTPPort: 80
               OriginProtocolPolicy: http-only
@@ -35,7 +43,7 @@ Resources:
           Bucket: !Sub
             - '${BlogAccesslogBucketName}.s3.${AWS::Region}.amazonaws.com'
             - BlogAccesslogBucketName: !ImportValue BlogAccesslogBucketName
-          Prefix: !ImportValue BlogPublicBucketName
+          Prefix: !ImportValue BlogBucketName
         CustomErrorResponses:
           - ErrorCachingMinTTL: 300
             ErrorCode: 403
@@ -51,24 +59,18 @@ Resources:
           MinTTL: 300
           ViewerProtocolPolicy: redirect-to-https
         Aliases:
-          - !ImportValue BlogHostedZoneName
+          - !Sub
+            - '${Site}.${HostedZone}'
+            - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+              HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
         ViewerCertificate:
-          SslSupportMethod: sni-only
+          MinimumProtocolVersion: TLSv1.2_2021 # recommended
+          SslSupportMethod: sni-only #  server name indication (SNI)
           AcmCertificateArn: !Ref AcmCertificateArn
+        HttpVersion: http2
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-cloudfront'
-
-  CloudFrontRecordSet:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      AliasTarget:
-        DNSName: !GetAtt CloudFrontDistribution.DomainName
-        HostedZoneId: Z2FDTNDATAQYW2
-      Comment: cloud front record set
-      HostedZoneId: !ImportValue BlogHostedZoneId
-      Name: !ImportValue BlogHostedZoneName
-      Type: A
 
 Outputs:
   CloudFrontDistributionId:
