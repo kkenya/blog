@@ -2,13 +2,24 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Description: create s3 bucket
 
+Mappings:
+  ZoneMap:
+    PublicHostedZone:
+      Name: gekishaman.work
+  SiteMap:
+    Blog:
+      Name: blog
+
 Resources:
   S3BucketPublic:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !ImportValue BlogHostedZoneName
+      BucketName: !Sub
+        - '${Site}.${HostedZone}'
+        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+          HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
       LifecycleConfiguration:
         Rules:
           - Id: NoncurrentVersionExpiration

@@ -65,10 +65,3 @@ Resources:
         - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
           HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
       Type: A
-
-Outputs:
-  PublicHostedZoneName:
-    Description: hosted zone name
-    Value: !FindInMap [ZoneMap, PublicHostedZone, Name]
-    Export:
-      Name: BlogHostedZoneName
