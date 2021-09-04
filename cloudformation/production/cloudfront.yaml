@@ -29,7 +29,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - Id: CustomOrigin
+          - Id: S3Origin
             DomainName: !Sub
               - '${BlogBucketName}.s3-website-${AWS::Region}.amazonaws.com'
               - BlogBucketName: !ImportValue BlogBucketName
@@ -71,6 +71,12 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-cloudfront'
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'blog distoributoin OAI'
 
 Outputs:
   CloudFrontDistributionId:

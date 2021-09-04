@@ -40,7 +40,7 @@ Resources:
                   - 0.0.0.0/0
                   - ::/0
       Policies:
-        - PolicyName: S3accessPolicy
+        - PolicyName: BlogS3BucketAccessPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:

@@ -11,7 +11,7 @@ Mappings:
       Name: blog
 
 Resources:
-  S3BucketPublic:
+  BlogS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -24,25 +24,17 @@ Resources:
         Rules:
           - Id: NoncurrentVersionExpiration
             Status: Enabled
-            NoncurrentVersionExpirationInDays: 3
+            NoncurrentVersionExpirationInDays: 7
       LoggingConfiguration:
-        DestinationBucketName: !Ref S3BucketAccesslogs
+        DestinationBucketName: !Ref S3BucketAccesslog
         LogFilePrefix: !Sub 's3/${AWS::StackName}'
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: false
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: false
       VersioningConfiguration:
         Status: Enabled
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: 404.html
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-public-bucket'
 
-  S3BucketAccesslogs:
+  S3BucketAccesslog:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
@@ -70,11 +62,11 @@ Resources:
 Outputs:
   PublicBucketName:
     Description: s3 public bucket name
-    Value: !Ref S3BucketPublic
+    Value: !Ref BlogS3Bucket
     Export:
       Name: BlogBucketName
   AccesslogBucketName:
     Description: s3 accesslog bucket name
-    Value: !Ref S3BucketAccesslogs
+    Value: !Ref S3BucketAccesslog
     Export:
       Name: BlogAccesslogBucketName
