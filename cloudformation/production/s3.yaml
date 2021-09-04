@@ -3,28 +3,22 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: create s3 bucket
 
 Mappings:
-  ZoneMap:
-    PublicHostedZone:
-      Name: gekishaman.work
-  SiteMap:
-    Blog:
-      Name: blog
+  S3BucketMap:
+    Assets:
+      Name: blog.gekishaman.work
 
 Resources:
-  BlogS3Bucket:
+  AssetsS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !Sub
-        - '${Site}.${HostedZone}'
-        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
-          HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
+      BucketName: !FindInMap ['S3BucketMap', 'Assets', 'Name']
       LifecycleConfiguration:
         Rules:
           - Id: NoncurrentVersionExpiration
             Status: Enabled
-            NoncurrentVersionExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 3
       LoggingConfiguration:
         DestinationBucketName: !Ref S3BucketAccesslog
         LogFilePrefix: !Sub 's3/${AWS::StackName}'
@@ -40,7 +34,9 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       AccessControl: LogDeliveryWrite
-      BucketName: !Sub '${AWS::StackName}-accesslogs-${AWS::Region}-${AWS::AccountId}'
+      BucketName: !Sub
+        - '${AssetsS3BacketName}-accesslogs'
+        - AssetsS3BacketName: !FindInMap ['S3BucketMap', 'Assets', 'Name']
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -60,13 +56,23 @@ Resources:
           Value: !Sub '${AWS::StackName}-accesslog-bucket'
 
 Outputs:
-  PublicBucketName:
-    Description: s3 public bucket name
-    Value: !Ref BlogS3Bucket
+  BlogAssetsS3BucketName:
+    Description: blog assets s3 bucket name
+    Value: !Ref AssetsS3Bucket
     Export:
-      Name: BlogBucketName
-  AccesslogBucketName:
-    Description: s3 accesslog bucket name
+      Name: BlogAssetsS3BucketName
+  BlogAssetsS3BucketDomainName:
+    Description: blog assets s3 bucket domain name
+    Value: !GetAtt AssetsS3Bucket.DomainName
+    Export:
+      Name: BlogAssetsS3BucketDomainName
+  BlogAccesslogS3BucketName:
+    Description: blog accesslog s3 bucket name
     Value: !Ref S3BucketAccesslog
     Export:
-      Name: BlogAccesslogBucketName
+      Name: BlogAccesslogS3BucketName
+  BlogAccesslogS3BucketDomainName:
+    Description: blog accesslog s3 bucket domain name
+    Value: !GetAtt S3BucketAccesslog.DomainName
+    Export:
+      Name: BlogAccesslogS3BucketDomainName

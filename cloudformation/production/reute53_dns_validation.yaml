@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  create record sets
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: ACM Configuration
+        Parameters:
+          - CertificateValidationRecordSetName
+          - CertificateValidationRecordSetValue
+
+Parameters:
+  CertificateValidationRecordSetName:
+    Type: String
+    Description: cname record set's name for dns validation on ACM certificate
+  CertificateValidationRecordSetValue:
+    Type: String
+    Description: cname record set's value for dns validation on ACM certificate
+
+Resources:
+  CertificateValidationRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: ACM certificate validation cname record set
+      HostedZoneId: !ImportValue PublicHostedZoneId
+      Name: !Ref CertificateValidationRecordSetName
+      ResourceRecords:
+        - !Ref CertificateValidationRecordSetValue
+      Type: CNAME
+      TTL: 300

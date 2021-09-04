@@ -1,31 +1,12 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: create hosted zone
-
-Parameters:
-  CertificateValidationRecordSetName:
-    Type: String
-    Description: cname record set's name for dns validation on ACM certificate
-  CertificateValidationRecordSetValue:
-    Type: String
-    Description: cname record set's value for dns validation on ACM certificate
-
-Metadata:
-  AWS::CloudFormation::Interface:
-    ParameterGroups:
-      - Label:
-          default: ACM Configuration
-        Parameters:
-          - CertificateValidationRecordSetName
-          - CertificateValidationRecordSetValue
+Description: |
+  create hosted zone
 
 Mappings:
   ZoneMap:
     PublicHostedZone:
       Name: gekishaman.work
-  SiteMap:
-    Blog:
-      Name: blog
 
 Resources:
   PublicHostedZone:
@@ -38,30 +19,14 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-public-hosted-zone'
 
-  CertificateValidationRecordSet:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      Comment: ACM certificate validation cname record set
-      HostedZoneId: !Ref PublicHostedZone
-      Name: !Ref CertificateValidationRecordSetName
-      ResourceRecords:
-        - !Ref CertificateValidationRecordSetValue
-      Type: CNAME
-      TTL: 300
-
-  BlogRecordSet:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      AliasTarget:
-        DNSName: !Sub
-          - '${Site}.${HostedZone}'
-          - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
-            HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
-        HostedZoneId: Z2FDTNDATAQYW2
-      Comment: blog record set
-      HostedZoneId: !Ref PublicHostedZone
-      Name: !Sub
-        - '${Site}.${HostedZone}'
-        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
-          HostedZone: !FindInMap ['ZoneMap', 'PublicHostedZone', 'Name']
-      Type: A
+Outputs:
+  PublicHostedZoneId:
+    Description: public hosted zone id
+    Value: !Ref PublicHostedZone
+    Export:
+      Name: PublicHostedZoneId
+  PublicHostedZoneName:
+    Description: public hosted zone name
+    Value: !FindInMap [ZoneMap, PublicHostedZone, Name]
+    Export:
+      Name: PublicHostedZoneName
