@@ -1,0 +1,207 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: create CodeBuild project for test
+
+Parameters:
+  GitHubRepositoryUrl:
+    Type: String
+    Description: GitHub reposity https clone url
+  BuildSpecFile:
+    Type: String
+    Description: buildSpec directory
+  SlackChannelId:
+    Type: String
+    Description: slack channel id for notification
+  ChatbotWorkspaceId:
+    Type: String
+    Description: Chatbot workspace id authorized from slack
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: CodeBuild Configuration
+        Parameters:
+          - GitHubRepositoryUrl
+          - BuildSpecFile
+      - Label:
+          default: Chatbogt Configuration
+        Parameters:
+          - SlackChannelId
+          - ChatbotWorkspaceId
+
+Mappings:
+  ServiceMap:
+    Blog:
+      Name: Blog
+  EnvironmentMap:
+    Production:
+      Name: production
+
+Resources:
+  BlogTestCodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Cache:
+        Location: LOCAL
+        Modes:
+          - LOCAL_SOURCE_CACHE
+        Type: LOCAL
+      Description: CodeBuild on Pull Request updated
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: ENVIRONMENT
+            Value: !FindInMap [EnvironmentMap, Production, Name]
+        Image: 'aws/codebuild/standard:4.0'
+        Type: LINUX_CONTAINER
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Sub
+            - '${Env}.${ServiceName}'
+            - Env: !FindInMap [EnvironmentMap, Production, Name]
+              ServiceName: !FindInMap [ServiceMap, Blog, Name]
+          StreamName: !Sub
+            - '${ServiceName}TestLog'
+            - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+          Status: ENABLED
+      Name: !Sub
+        - '${ServiceName}Test' # ChatBot display name
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      QueuedTimeoutInMinutes: 10
+      ServiceRole: !Ref BlogTestCodeBuildRole
+      Source:
+        BuildSpec: !Ref BuildSpecFile
+        BuildStatusConfig:
+          Context: Run test # display as check name
+          # TargetUrl: this build url
+        Location: !Ref GitHubRepositoryUrl
+        ReportBuildStatus: true
+        SourceIdentifier: !Sub
+          - '${ServiceName}GitHubRepository'
+          - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+        Type: GITHUB
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - '${ServiceName}TestCodeBuild'
+            - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      TimeoutInMinutes: 10
+      Triggers:
+        FilterGroups:
+          - - ExcludeMatchedPattern: false
+              Pattern: 'PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED'
+              Type: EVENT
+        Webhook: true
+
+  BlogTestCodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - '${ServiceName}TestCodeBuildRole'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: 'sts:AssumeRole'
+      Path: '/'
+
+  BlogTestCodeBuildPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub
+        - '${ServiceName}TestCodeBUildPolicy'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Resource: !Sub
+              - 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${GroupName}:log-stream*'
+              - GroupName: !Sub
+                  - '${Env}.${ServiceName}'
+                  - Env: !FindInMap [EnvironmentMap, Production, Name]
+                    ServiceName: !FindInMap [ServiceMap, Blog, Name]
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+          - Resource: !Sub 'arn:aws:s3:::codepipeline-${AWS::Region}-*'
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:GetObjectVersion
+              - s3:GetBucketAcl
+              - s3:GetBucketLocation
+          - Resource: !Sub
+              - 'arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:report-group/${ServiceName}*'
+              - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+            Effect: Allow
+            Action:
+              - codebuild:CreateReportGroup
+              - codebuild:CreateReport
+              - codebuild:UpdateReport
+              - codebuild:BatchPutTestCases
+              - codebuild:BatchPutCodeCoverages
+      Roles:
+        - !Ref BlogTestCodeBuildRole
+
+  BlogTestChatbot:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: !Sub
+        - '${ServiceName}TestChatbot'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      IamRoleArn: !GetAtt BlogTestChatbotRole.Arn
+      LoggingLevel: ERROR
+      SlackChannelId: !Ref SlackChannelId
+      SlackWorkspaceId: !Ref ChatbotWorkspaceId
+
+  BlogTestChatbotRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub
+        - '${ServiceName}TestChatbotRole'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: chatbot.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ChatbotNotificationOnlyPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:Describe*
+                  - cloudwatch:Get*
+                  - cloudwatch:List*
+                Resource:
+                  - '*'
+
+  BlogTestNotificationRule:
+    Type: AWS::CodeStarNotifications::NotificationRule
+    Properties:
+      DetailType: FULL
+      EventTypeIds:
+        - codebuild-project-build-state-failed
+        - codebuild-project-build-state-succeeded
+      Name: !Sub
+        - '${ServiceName}TestNotificationRule'
+        - ServiceName: !FindInMap [ServiceMap, Blog, Name]
+      Resource: !GetAtt BlogTestCodeBuildProject.Arn
+      Status: ENABLED
+      # Tags: Json # json only
+      Targets:
+        - TargetAddress: !Ref BlogTestChatbot
+          TargetType: AWSChatbotSlack
