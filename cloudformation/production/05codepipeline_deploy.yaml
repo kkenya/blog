@@ -1,6 +1,8 @@
-AWSTemplateFormatVersion: "2010-09-09"
+AWSTemplateFormatVersion: '2010-09-09'
 
-Description: create CodePipeline to deploy static site
+Description: |
+  create CodePipeline to deploy static site
+  use lower case for stackname
 
 Mappings:
   GitHubMapping:
@@ -16,7 +18,7 @@ Resources:
         Location: !Ref ArtifactStore
         Type: S3
       Name: !Sub codePipeline-${AWS::StackName}
-      # RoleArn: String
+      RoleArn: !GetAtt DeploypipelineServiceRole.Arn
       Stages:
         - Actions:
             - ActionTypeId: # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
@@ -79,12 +81,12 @@ Resources:
   ArtifactStore:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: !Sub 'artifactStore-${AWS::StackName}'
+      BucketName: !Sub 'artifact-store-${AWS::StackName}'
 
   SourceConnection: # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codestarconnections-connection.html
     Type: AWS::CodeStarConnections::Connection
     Properties:
-      ConnectionName: !Sub 'codeStartConnection-${AWS::StackName}'
+      ConnectionName: !Sub '${AWS::StackName}'
       ProviderType: GitHub
       Tags:
         - Key: Name
@@ -98,11 +100,11 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-                - codepipeline.amazonaws.com
+              Service: codepipeline.amazonaws.com
             Action:
               - sts:AssumeRole
       Description: code pipeline service role
-      Path: /aws-service-role/
+      Path: /
       RoleName: !Sub 'codepipeline-role-${AWS::StackName}'
       Policies:
         - PolicyName: !Sub 'codepipeline-policy-${AWS::StackName}'
@@ -150,14 +152,11 @@ Resources:
       Name: !Sub 'codeBuild-${AWS::StackName}'
       QueuedTimeoutInMinutes: 30 # Minimum: 5, Maximum: 480
       # ResourceAccessRole: String
-      ServiceRole: !!GetAtt DeploypipelineServiceRole.Arn
+      ServiceRole: !GetAtt BuildSourceServiceRole.Arn
       Source: # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-source.html
         BuildSpec: specs/build.yaml
-        BuildStatusConfig:
-          Context: Build source # display as check name
-        ReportBuildStatus: true
-        SourceIdentifier: BuildSource
-        Type: GITHUB
+        SourceIdentifier: DeployBuildSource
+        Type: CODEPIPELINE
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-CodeBuild'
@@ -175,7 +174,7 @@ Resources:
             Action:
               - sts:AssumeRole
       Description: code build service role
-      Path: /aws-service-role/
+      Path: /
       RoleName: !Sub 'codebuild-role-${AWS::StackName}'
       Policies:
         - PolicyName: !Sub 'codebuild-policy-${AWS::StackName}'
