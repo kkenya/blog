@@ -5,6 +5,9 @@ Description: |
   use lower case for stackname
 
 Mappings:
+  SiteMap:
+    Blog:
+      Name: blog
   GitHubMapping:
     Repository:
       FullRepositoryId: kkenya/blog
@@ -15,7 +18,7 @@ Resources:
     Type: AWS::CodePipeline::Pipeline
     Properties:
       ArtifactStore:
-        Location: !Ref ArtifactStore
+        Location: !Ref ArtifactBucket
         Type: S3
       Name: !Sub codePipeline-${AWS::StackName}
       RoleArn: !GetAtt DeploypipelineServiceRole.Arn
@@ -27,7 +30,10 @@ Resources:
                 Provider: CodeStarSourceConnection
                 Version: '1'
               Configuration:
-                ConnectionArn: !Ref SourceConnection
+                ConnectionArn:
+                  Fn::ImportValue: !Sub
+                    - ${ServiceName}SourceConnectionARN
+                    - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
                 FullRepositoryId:
                   !FindInMap ['GitHubMapping', 'Repository', 'FullRepositoryId']
                 BranchName:
@@ -50,7 +56,7 @@ Resources:
                 BatchEnabled: false
                 CombineArtifacts: false
                 ProjectName: !Ref BuildSource
-                # EnvironmentVariables: '[{"name":"TEST_VARIABLE","value":"TEST_VALUE","type":"PLAINTEXT"},{"name":"ParamStoreTest","value":"PARAMETER_NAME","type":"PARAMETER_STORE"}]'
+                # EnvironmentVariables
               InputArtifacts:
                 - Name: SourceArtifact
               Name: BuildAction
@@ -78,19 +84,10 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-CodePipeline'
 
-  ArtifactStore:
+  ArtifactBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       BucketName: !Sub 'artifact-store-${AWS::StackName}'
-
-  SourceConnection: # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codestarconnections-connection.html
-    Type: AWS::CodeStarConnections::Connection
-    Properties:
-      ConnectionName: !Sub '${AWS::StackName}'
-      ProviderType: GitHub
-      Tags:
-        - Key: Name
-          Value: !Sub '${AWS::StackName}-CodePipeline'
 
   DeploypipelineServiceRole:
     Type: AWS::IAM::Role
@@ -104,21 +101,35 @@ Resources:
             Action:
               - sts:AssumeRole
       Description: code pipeline service role
-      Path: /
+      Path: /service-role/
       RoleName: !Sub 'codepipeline-role-${AWS::StackName}'
       Policies:
         - PolicyName: !Sub 'codepipeline-policy-${AWS::StackName}'
           PolicyDocument:
             Version: 2012-10-17
             Statement:
-              - Sid: S3Policy
+              - Sid: useConnection
                 Effect: Allow
                 Resource:
-                  - !GetAtt ArtifactStore.Arn
+                  - Fn::ImportValue: !Sub
+                      - ${ServiceName}SourceConnectionARN
+                      - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
                 Action:
-                  - s3:GetObject
-                  - s3:List*
-                  - s3:PutObject
+                  - codestar-connections:UseConnection
+              - Sid: S3AnyPolicy
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - '${BucketArn}*'
+                    - BucketArn: !GetAtt ArtifactBucket.Arn
+                Action:
+                  - s3:*
+              - Sid: CodeBuildAnyPolicy
+                Effect: Allow
+                Resource:
+                  - !GetAtt BuildSource.Arn
+                Action:
+                  - codebuild:* # buildStart only
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-CodePipeline'
@@ -174,7 +185,7 @@ Resources:
             Action:
               - sts:AssumeRole
       Description: code build service role
-      Path: /
+      Path: /service-role/
       RoleName: !Sub 'codebuild-role-${AWS::StackName}'
       Policies:
         - PolicyName: !Sub 'codebuild-policy-${AWS::StackName}'
@@ -193,11 +204,11 @@ Resources:
               - Sid: S3Policy
                 Effect: Allow
                 Resource:
-                  - !GetAtt ArtifactStore.Arn
+                  - !Sub
+                    - '${BucketArn}*'
+                    - BucketArn: !GetAtt ArtifactBucket.Arn
                 Action:
-                  - s3:GetObject
-                  - s3:List*
-                  - s3:PutObject
+                  - s3:*
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-CodeBuild'
