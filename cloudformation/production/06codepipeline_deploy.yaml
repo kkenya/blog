@@ -116,11 +116,11 @@ Resources:
                       - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
                 Action:
                   - codestar-connections:UseConnection
-              - Sid: S3AnyPolicy
+              - Sid: S3ArtifactAnyPolicy
                 Effect: Allow
                 Resource:
                   - !Sub
-                    - '${BucketArn}*'
+                    - '${BucketArn}/*'
                     - BucketArn: !GetAtt ArtifactBucket.Arn
                 Action:
                   - s3:*
@@ -130,6 +130,14 @@ Resources:
                   - !GetAtt BuildSource.Arn
                 Action:
                   - codebuild:* # buildStart only
+              - Sid: S3PublishAnyPolicy
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - 'arn:aws:s3:::${BucketName}/*'
+                    - BucketName: !ImportValue BlogAssetsS3BucketName
+                Action:
+                  - s3:*
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-CodePipeline'
@@ -205,7 +213,7 @@ Resources:
                 Effect: Allow
                 Resource:
                   - !Sub
-                    - '${BucketArn}*'
+                    - '${BucketArn}/*'
                     - BucketArn: !GetAtt ArtifactBucket.Arn
                 Action:
                   - s3:*
