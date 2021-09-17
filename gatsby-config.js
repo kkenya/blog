@@ -1,7 +1,7 @@
 module.exports = {
   siteMetadata: {
-    title: `webエンジニアの蛙のブログ`,
-    description: `webエンジニアの蛙のブログ`,
+    title: `蛙(かわづ)のテックブログ`,
+    description: `蛙(かわづ)のテックブログ`,
     siteUrl: `https://blog.gekishiman.work`,
   },
   plugins: [
