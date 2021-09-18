@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  create chatbot configuration for slack notification
+
+Mappings:
+  SiteMap:
+    Blog:
+      Name: blog
+
+Parameters:
+  NotificationSlackChannelId:
+    Type: String
+    Description: slack channel id for notification
+  ChatbotWorkspaceId:
+    Type: String
+    Description: Chatbot workspace id authorized from slack
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Chatbot Configuration
+        Parameters:
+          - NotificationSlackChannelId
+          - ChatbotWorkspaceId
+
+Resources:
+  ConfigrationOfNotification:
+    Type: AWS::Chatbot::SlackChannelConfiguration
+    Properties:
+      ConfigurationName: !Sub
+        - ConfigrationOf${Site}DeployNotification
+        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+      IamRoleArn: !GetAtt NotificationRole.Arn
+      LoggingLevel: INFO
+      SlackChannelId: !Ref NotificationSlackChannelId
+      SlackWorkspaceId: !Ref ChatbotWorkspaceId
+      SnsTopicArns:
+        - Fn::ImportValue: !Sub
+            - ${ServiceName}NotificationTopicArn
+            - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+
+  NotificationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: chatbot.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: !Sub 'notification role of ${AWS::StackName}'
+      Path: /service-role/
+      RoleName: !Sub 'notification-${AWS::StackName}'
+      Policies:
+        - PolicyName: !Sub 'notification-policy-${AWS::StackName}'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: NotificationsOnly
+                Effect: Allow
+                Action:
+                  - cloudwatch:Describe*
+                  - cloudwatch:Get*
+                  - cloudwatch:List*
+                Resource:
+                  - '*'

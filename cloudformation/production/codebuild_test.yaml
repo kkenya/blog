@@ -25,7 +25,7 @@ Metadata:
           - GitHubRepositoryUrl
           - BuildSpecFile
       - Label:
-          default: Chatbogt Configuration
+          default: Chatbot Configuration
         Parameters:
           - SlackChannelId
           - ChatbotWorkspaceId
