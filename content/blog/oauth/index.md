@@ -1,4 +1,9 @@
-# OAuth2
+---
+title: OAuth
+date: "2021-09-20T23:50:49+09:00"
+description: "OAuth2.0について"
+status: draft
+---
 
 ## TOFU(Truest On First Use)
 

@@ -1,3 +1,10 @@
+---
+title: GraphQL
+date: "2021-09-22T23:04:33+09:00"
+description: "Githubの草を取得した"
+status: draft
+---
+
 ## GraphQL
 
 ### field
@@ -1900,12 +1907,6 @@ query UserDailyContibutions($username: String!) {
 [GraphQL Client](https://graphql.org/graphql-js/graphql-clients/)
 
 npm i node-fetch
-
-## fragments
-
-```js
-
-```
 
 ## github v4
 
