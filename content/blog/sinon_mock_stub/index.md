@@ -2,6 +2,7 @@
 title: sinonのstubとmockについて
 date: "2021-09-17T13:07:59.710Z"
 description: sinonのstubとmockについて整理したメモ
+status: published
 ---
 
 普段テストライブラリにはtypescriptのプロジェクトなら jest + sinon, javascriptのプロジェクトなら mocha + sinon を利用している。sinonのmockとstubの使い分けについて整理したメモ。

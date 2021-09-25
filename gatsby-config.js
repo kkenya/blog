@@ -4,8 +4,8 @@ module.exports = {
     description: `蛙のテックブログ`,
     siteUrl: `https://blog.gekishiman.work`,
     bio: {
-      description: `Web系エンジニアの備忘録`
-    }
+      description: `Web系エンジニアの備忘録`,
+    },
   },
   plugins: [
     `gatsby-plugin-image`,
@@ -85,6 +85,7 @@ module.exports = {
               {
                 allMarkdownRemark(
                   sort: { order: DESC, fields: [frontmatter___date] },
+                  filter: {frontmatter: {status: {eq: "published"}}},
                 ) {
                   nodes {
                     excerpt
