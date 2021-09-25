@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  connect source
+
+Parameters:
+  ProviderType:
+    Type: String
+    Default: GitHub
+    AllowedValues:
+      - Bitbucket
+      - GitHub
+      - GitHubEnterpriseServer
+
+Mappings:
+  SiteMap:
+    Blog:
+      Name: blog
+
+Resources:
+  # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codestarconnections-connection.html
+  SourceConnection:
+    Type: 'AWS::CodeStarConnections::Connection'
+    Properties:
+      ConnectionName: !Sub '${AWS::StackName}'
+      ProviderType: !Ref ProviderType
+
+Outputs:
+  SourceConnection:
+    Value: !Ref SourceConnection
+    Export:
+      Name: !Sub
+        - ${ServiceName}SourceConnectionARN
+        - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']

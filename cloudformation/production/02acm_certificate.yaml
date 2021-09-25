@@ -1,8 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-# CloudFrontの証明書はus-east-1で発行する必要があるためクロススタックは利用できない
 Description: |
-  create ACM certificate for cloudFront
+  ACM certificate for cloudFront
+  create in US East (N. Virginia)us-east-1
 
 Mappings:
   ZoneMap:
@@ -20,5 +20,7 @@ Resources:
           - DomainName: !FindInMap [ZoneMap, PublicHostedZone, Name]
       Tags:
         - Key: Name
-          Value: !FindInMap [ZoneMap, PublicHostedZone, Name]
+          Value: !Sub
+            - acm certificate for ${DomainName}
+            - DomainName: !FindInMap [ZoneMap, PublicHostedZone, Name]
       ValidationMethod: DNS

@@ -2,42 +2,41 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 Description: create s3 bucket
 
+Mappings:
+  S3BucketMap:
+    Assets:
+      Name: blog.gekishaman.work
+
 Resources:
-  S3BucketPublic:
+  AssetsS3Bucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !ImportValue BlogHostedZoneName
+      BucketName: !FindInMap ['S3BucketMap', 'Assets', 'Name']
       LifecycleConfiguration:
         Rules:
           - Id: NoncurrentVersionExpiration
             Status: Enabled
             NoncurrentVersionExpirationInDays: 3
       LoggingConfiguration:
-        DestinationBucketName: !Ref S3BucketAccesslogs
+        DestinationBucketName: !Ref S3BucketAccesslog
         LogFilePrefix: !Sub 's3/${AWS::StackName}'
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: false
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: false
       VersioningConfiguration:
         Status: Enabled
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: 404.html
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-public-bucket'
 
-  S3BucketAccesslogs:
+  S3BucketAccesslog:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
       AccessControl: LogDeliveryWrite
-      BucketName: !Sub '${AWS::StackName}-accesslogs-${AWS::Region}-${AWS::AccountId}'
+      BucketName: !Sub
+        - '${AssetsS3BacketName}-accesslogs'
+        - AssetsS3BacketName: !FindInMap ['S3BucketMap', 'Assets', 'Name']
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -56,32 +55,24 @@ Resources:
         - Key: Name
           Value: !Sub '${AWS::StackName}-accesslog-bucket'
 
-  S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3BucketPublic
-      PolicyDocument:
-        Id: !Sub '${AWS::StackName}-BucketPolicy'
-        Statement:
-          - Sid: AddPerm
-            Effect: Allow
-            Principal: '*'
-            Action:
-              - s3:GetObject
-            Resource:
-              - !Sub 'arn:aws:s3:::${S3BucketPublic}/*'
-            Condition:
-              StringEquals:
-                aws:UserAgent: Amazon CloudFront
-
 Outputs:
-  PublicBucketName:
-    Description: s3 public bucket name
-    Value: !Ref S3BucketPublic
+  BlogAssetsS3BucketName:
+    Description: blog assets s3 bucket name
+    Value: !Ref AssetsS3Bucket
     Export:
-      Name: BlogPublicBucketName
-  AccesslogBucketName:
-    Description: s3 accesslog bucket name
-    Value: !Ref S3BucketAccesslogs
+      Name: BlogAssetsS3BucketName
+  BlogAssetsS3BucketDomainName:
+    Description: blog assets s3 bucket domain name
+    Value: !GetAtt AssetsS3Bucket.DomainName
     Export:
-      Name: BlogAccesslogBucketName
+      Name: BlogAssetsS3BucketDomainName
+  BlogAccesslogS3BucketName:
+    Description: blog accesslog s3 bucket name
+    Value: !Ref S3BucketAccesslog
+    Export:
+      Name: BlogAccesslogS3BucketName
+  BlogAccesslogS3BucketDomainName:
+    Description: blog accesslog s3 bucket domain name
+    Value: !GetAtt S3BucketAccesslog.DomainName
+    Export:
+      Name: BlogAccesslogS3BucketDomainName

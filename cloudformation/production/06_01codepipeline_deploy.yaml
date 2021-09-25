@@ -1,0 +1,290 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  create CodePipeline to deploy static site
+  use lower case for stackname
+
+Mappings:
+  SiteMap:
+    Blog:
+      Name: blog
+  GitHubMapping:
+    Repository:
+      FullRepositoryId: kkenya/blog
+      BranchName: main
+
+Resources:
+  DeployPipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        Location: !Ref ArtifactBucket
+        Type: S3
+      Name: !Sub CodePipeline-${AWS::StackName}
+      RoleArn: !GetAtt DeployPipelineServiceRole.Arn
+      Stages:
+        - Actions:
+            - ActionTypeId: # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodestarConnectionSource.html
+                Category: Source
+                Owner: AWS
+                Provider: CodeStarSourceConnection
+                Version: '1'
+              Configuration:
+                ConnectionArn:
+                  Fn::ImportValue: !Sub
+                    - ${ServiceName}SourceConnectionARN
+                    - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+                FullRepositoryId:
+                  !FindInMap ['GitHubMapping', 'Repository', 'FullRepositoryId']
+                BranchName:
+                  !FindInMap ['GitHubMapping', 'Repository', 'BranchName']
+                OutputArtifactFormat: CODE_ZIP # default
+                DetectChanges: true # Controls automatically starting your pipeline when a new commit is made on the configured repository and branch. If unspecified, the default value is true
+              Name: SourceAction
+              Namespace: SourceAction
+              OutputArtifacts:
+                - Name: SourceArtifact
+              RunOrder: 1
+          Name: SourceAction
+        - Actions:
+            - ActionTypeId: # https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-CodeBuild.html
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: '1'
+              Configuration:
+                BatchEnabled: false
+                CombineArtifacts: false
+                ProjectName: !Ref BuildSource
+                # EnvironmentVariables
+              InputArtifacts:
+                - Name: SourceArtifact
+              Name: BuildAction
+              Namespace: BuildAction
+              OutputArtifacts:
+                - Name: BuildArtifact
+              RunOrder: 1
+          Name: BuildAction
+        - Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: S3
+                Version: '1'
+              Configuration:
+                BucketName: !ImportValue BlogAssetsS3BucketName
+                Extract: true
+              InputArtifacts:
+                - Name: BuildArtifact
+              Name: DeployAction
+              Namespace: DeployAction
+              RunOrder: 1
+          Name: DeployAction
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-CodePipeline'
+
+  ArtifactBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'artifact-store-${AWS::StackName}'
+
+  DeployPipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: !Sub 'code pipeline service role of ${AWS::StackName}'
+      Path: /service-role/
+      RoleName: !Sub 'codepipeline-${AWS::StackName}'
+      Policies:
+        - PolicyName: !Sub 'codepipeline-policy-${AWS::StackName}'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: useConnection
+                Effect: Allow
+                Resource:
+                  - Fn::ImportValue: !Sub
+                      - ${ServiceName}SourceConnectionARN
+                      - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+                Action:
+                  - codestar-connections:UseConnection
+              - Sid: S3ArtifactAnyPolicy
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - '${BucketArn}/*'
+                    - BucketArn: !GetAtt ArtifactBucket.Arn
+                Action:
+                  - s3:*
+              - Sid: CodeBuildAnyPolicy
+                Effect: Allow
+                Resource:
+                  - !GetAtt BuildSource.Arn
+                Action:
+                  - codebuild:* # buildStart only
+              - Sid: S3PublishAnyPolicy
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - 'arn:${AWS::Partition}:s3:::${BucketName}/*'
+                    - BucketName: !ImportValue BlogAssetsS3BucketName
+                Action:
+                  - s3:*
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-CodePipeline'
+
+  BuildSource:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts: # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-artifacts.html
+        Type: CODEPIPELINE
+      Cache:
+        Type: NO_CACHE # default
+      ConcurrentBuildLimit: 1
+      Description: !Sub 'codeBuild for ${AWS::StackName}'
+      Environment: # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-environment.html
+        ComputeType: BUILD_GENERAL1_SMALL
+        EnvironmentVariables:
+          - Name: NODE_ENV
+            Type: PLAINTEXT
+            Value: production
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0 # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-available.html
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      LogsConfig:
+        CloudWatchLogs:
+          GroupName: !Sub '/aws/codebuild/${AWS::StackName}'
+          Status: ENABLED
+          StreamName: build-log
+        S3Logs:
+          Status: DISABLED
+      Name: !Sub 'codeBuild-${AWS::StackName}'
+      QueuedTimeoutInMinutes: 30 # Minimum: 5, Maximum: 480
+      # ResourceAccessRole: String
+      ServiceRole: !GetAtt BuildSourceServiceRole.Arn
+      Source: # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-codebuild-project-source.html
+        BuildSpec: specs/build.yaml
+        SourceIdentifier: DeployBuildSource
+        Type: CODEPIPELINE
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-CodeBuild'
+      TimeoutInMinutes: 30 # default: 60, Minimum: 5, Maximum: 480
+
+  BuildSourceServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: code build service role
+      Path: /service-role/
+      RoleName: !Sub 'codebuild-role-${AWS::StackName}'
+      Policies:
+        - PolicyName: !Sub 'codebuild-policy-${AWS::StackName}'
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Sid: CloudWatchLogsPolicy
+                Effect: Allow
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}'
+                  - !Sub 'arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}:*'
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+              - Sid: S3Policy
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - '${BucketArn}/*'
+                    - BucketArn: !GetAtt ArtifactBucket.Arn
+                Action:
+                  - s3:*
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-CodeBuild'
+
+  NotificationRule:
+    Type: AWS::CodeStarNotifications::NotificationRule
+    Properties:
+      DetailType: FULL
+      EventTypeIds: # https://docs.aws.amazon.com/dtconsole/latest/userguide/concepts.html#concepts-api
+        # - codepipeline-pipeline-stage-execution-started
+        # - codepipeline-pipeline-stage-execution-succeeded
+        - codepipeline-pipeline-stage-execution-resumed
+        - codepipeline-pipeline-stage-execution-canceled
+        - codepipeline-pipeline-stage-execution-failed
+        - codepipeline-pipeline-pipeline-execution-failed
+        - codepipeline-pipeline-pipeline-execution-canceled
+        # - codepipeline-pipeline-pipeline-execution-started
+        - codepipeline-pipeline-pipeline-execution-resumed
+        - codepipeline-pipeline-pipeline-execution-succeeded
+        - codepipeline-pipeline-pipeline-execution-superseded
+      Name: !Sub
+        - '${ServiceName}TestNotificationRule'
+        - ServiceName: !FindInMap [SiteMap, Blog, Name]
+      Resource: !Sub
+        - arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}
+        - PipelineName: !Ref DeployPipeline
+      Status: ENABLED
+      Targets:
+        - TargetAddress: !Ref NotificationTopic
+          TargetType: SNS
+
+  NotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: !Sub
+        - ${Site}DeployNotification
+        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - ${Site}DeployNotification
+            - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+      TopicName: !Sub
+        - ${Site}DeployNotification
+        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+
+  NotificationTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: NotificationPublish
+            Effect: Allow
+            Principal:
+              Service:
+                - codestar-notifications.amazonaws.com
+            Action:
+              - SNS:Publish
+            Resource:
+              - !Ref NotificationTopic
+      Topics:
+        - !Ref NotificationTopic
+
+Outputs:
+  NotificationTopicArn:
+    Value: !Ref NotificationTopic
+    Export:
+      Name: !Sub
+        - ${ServiceName}NotificationTopicArn
+        - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']

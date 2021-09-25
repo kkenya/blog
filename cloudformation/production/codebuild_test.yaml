@@ -25,7 +25,7 @@ Metadata:
           - GitHubRepositoryUrl
           - BuildSpecFile
       - Label:
-          default: Chatbogt Configuration
+          default: Chatbot Configuration
         Parameters:
           - SlackChannelId
           - ChatbotWorkspaceId
@@ -111,7 +111,7 @@ Resources:
             Action: 'sts:AssumeRole'
       Path: '/'
 
-  BlogTestCodeBUildPolicy:
+  BlogTestCodeBuildPolicy:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: !Sub
