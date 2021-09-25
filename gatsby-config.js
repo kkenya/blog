@@ -3,6 +3,9 @@ module.exports = {
     title: `蛙のテックブログ`,
     description: `蛙のテックブログ`,
     siteUrl: `https://blog.gekishiman.work`,
+    bio: {
+      description: `Web系エンジニアの備忘録`
+    }
   },
   plugins: [
     `gatsby-plugin-image`,
