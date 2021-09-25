@@ -228,9 +228,9 @@ Resources:
       EventTypeIds: # https://docs.aws.amazon.com/dtconsole/latest/userguide/concepts.html#concepts-api
         # - codepipeline-pipeline-stage-execution-started
         # - codepipeline-pipeline-stage-execution-succeeded
-        - codepipeline-pipeline-stage-execution-resumed
-        - codepipeline-pipeline-stage-execution-canceled
-        - codepipeline-pipeline-stage-execution-failed
+        # - codepipeline-pipeline-stage-execution-resumed
+        # - codepipeline-pipeline-stage-execution-canceled
+        # - codepipeline-pipeline-stage-execution-failed
         - codepipeline-pipeline-pipeline-execution-failed
         - codepipeline-pipeline-pipeline-execution-canceled
         # - codepipeline-pipeline-pipeline-execution-started
