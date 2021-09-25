@@ -1,0 +1,13 @@
+rules:
+    # https://github.com/azu/textlint-rule-spellcheck-tech-word
+    # 技術用語
+    spellcheck-tech-word: true
+    # https://github.com/textlint-ja/textlint-rule-preset-JTF-style
+    # JTF日本語標準スタイルガイド（翻訳用）
+    preset-jtf-style:
+      1.2.2.ピリオド(.)とカンマ(,): false
+      4.3.1.丸かっこ（）: false
+    # https://github.com/textlint-ja/textlint-rule-preset-ja-technical-writing
+    # 技術文書向けプリセット
+    preset-ja-technical-writing:
+      no-exclamation-question-mark: false
