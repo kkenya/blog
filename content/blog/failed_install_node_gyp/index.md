@@ -37,9 +37,9 @@ xcodeの再インストールをしてもエラーになる場合は[I did all t
 
 >Both upgrading to macOS Catalina and running a Software Update in Catalina may cause normal node-gyp installations to fail.
 
-## 対応したログ
+## 試したが有効ではなかった
 
-xcodeのインストールを実行したが、インストール済みと表示される
+xcodeのインストールを実行したが、インストール済みと表示された
 
 ```sh
 % xcode-select --install
@@ -47,7 +47,7 @@ xcodeのインストールを実行したが、インストール済みと表示
 xcode-select: error: command line tools are already installed, use "Software Update" to install updates
 ```
 
-rootユーザーでxcodeんをリセットしてインストールし直す
+rootユーザーでxcodeをリセットしてインストールし直したが、変わらず
 
 ```sh
 % xcode-select --reset
@@ -55,14 +55,12 @@ xcode-select: error: --reset must be run as root (e.g. `sudo xcode-select --rese
 % sudo xcode-select --reset
 ```
 
-## 試したが有効ではなかった
-
 ```sh
 % xcodebuild --version
 xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
 ```
 
-AppStoreでxcodeのインストールしようとするが、カタリナではできない
+AppStoreでxcodeのインストールしようとするが、カタリナではできなかった
 
 ![xcode installation error](./app_store.png)
 
