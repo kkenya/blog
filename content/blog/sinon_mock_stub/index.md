@@ -1,7 +1,6 @@
 ---
 title: sinonのstubとmockについて
 date: "2021-09-17T13:07:59.710Z"
-description: sinonのstubとmockについて整理したメモ
 status: published
 ---
 

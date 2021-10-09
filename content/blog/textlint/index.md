@@ -1,7 +1,6 @@
 ---
 title: textlintの導入
 date: "2018-11-23T23:32:43+09:00"
-description: "ブログ記事の添削にtextlintを導入した"
 status: draft
 ---
 

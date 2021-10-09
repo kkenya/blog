@@ -1,7 +1,6 @@
 ---
 title: "以前から利用していたhusky v4のhooksが実行されない"
 date: "2021-10-07T23:48:00+09:00"
-description: "以前から利用していたhusky v4のhooksが実行されない"
 status: published
 ---
 

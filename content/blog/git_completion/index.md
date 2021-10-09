@@ -1,7 +1,6 @@
 ---
 title: Macでgitバージョンアップ
 date: "2018-12-04T06:42:00.000Z"
-description: Macにプリインストールされているgitからhomebrewでインストールしたgitに移行する
 status: published
 ---
 

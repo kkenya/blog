@@ -1,7 +1,6 @@
 ---
 title: bashでプロンプトの表示設定変更
 date: "2018-11-29T02:23:00.000Z"
-description: "プロンプトの表示を色々といじった時のメモ"
 status: published
 ---
 

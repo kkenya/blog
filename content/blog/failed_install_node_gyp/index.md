@@ -1,7 +1,6 @@
 ---
 title: "macOS Catalinaのnode-gypインストールが失敗する"
 date: "2021-10-08T11:52:06+09:00"
-description: "macOS Catalinaのnode-gypインストールが失敗する"
 status: published
 ---
 
