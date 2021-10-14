@@ -6,16 +6,15 @@ status: published
 
 ## Macでgitバージョンアップ
 
-Macにプリインストールされているgitからhomebrewでインストールしたgitに移行する
-
-gitのインストール先を確認
+Macにプリインストールされているgitからhomebrewでインストールしたgitに移行する。
+gitのインストール先を確認。
 
 ```sh
 $ which git
 /usr/bin/git
 ```
 
-brewでインストールすると、同時にgit補完のためのスクリプトもインストールされる
+brewでインストールすると、同時にgit補完のためのスクリプトもインストールされる。
 
 ```sh
 $ brew install git
@@ -35,7 +34,7 @@ Emacs Lisp files have been installed to:
   /usr/local/share/emacs/site-lisp/git
 ```
 
-gitのバージョンを確認し、インストールしたバージョンが反映されていれば成功
+gitのバージョンを確認し、インストールしたバージョンが反映されていれば成功。
 
 ```sh
 $ git --version
@@ -46,25 +45,22 @@ $ which git
 
 ## gitの補完を有効にする
 
-先ほどインストールされた補完スクリプトのディレクトリを確認
+先ほどインストールされた補完スクリプトのディレクトリを確認。
 
 ```sh
 $ ls /usr/local/etc/bash_completion.d
 brew			git-completion.bash	git-prompt.sh		nodebrew		npm
 ```
 
-`git-completion.bash`と`git-prompt.sh`をシェルで読み込むように指定する
+`git-completion.bash`と`git-prompt.sh`をシェルで読み込むように指定する。
 
-```sh
-vim ~/.bash_profile
-```
-
-```~/.bash_profile
+```shell
+# ~/.bash_profile
 source /usr/local/etc/bash_completion.d/git-completion.bash
 source /usr/local/etc/bash_completion.d/git-prompt.sh
 ```
 
-シェルの設定ファイルを再度読み込み
+シェルの設定ファイルを再度読み込む。
 
 ```sh
 source ~/.bash_profile

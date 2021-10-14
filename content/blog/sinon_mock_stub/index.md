@@ -8,7 +8,7 @@ status: published
 
 ## 自分の結論
 
-Sinonを利用して振る舞いを上書きしたオブジェクト(または関数)の検証にはmockを利用する。これは[mockのドキュメント](https://sinonjs.org/releases/v11.1.2/mocks/)の `When to use mocks?` にも書かれている。
+Sinonを利用して振る舞いを上書きしたオブジェクト（または関数）の検証にはmockを利用する。これは[mockのドキュメント](https://sinonjs.org/releases/v11.1.2/mocks/)の `When to use mocks?` にも書かれている。
 
 >If you want to control how your unit is being used and like stating expectations upfront (as opposed to asserting after the fact), use a mock.
 

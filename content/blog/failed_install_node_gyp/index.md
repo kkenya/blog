@@ -10,11 +10,11 @@ macOS Catalinaで `node-gyp` インストール時に `gyp: No Xcode or CLT vers
 
 ## 環境
 
-- macOS Catalina バージョン 10.15.7
+- macOS Catalina version 10.15.7
 
 ## 結論
 
-xcodeの再インストールを行う。対応を `node-gyp` の[リポジトリでまとめてくれている](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#the-acid-test)ので書いてある通りに対応すれば問題なかった
+xcodeの再インストールを行う。対応を `node-gyp` の[リポジトリでまとめてくれている](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#the-acid-test)ので書いてある通りに対応すれば問題なかった。
 
 ```sh
 sudo rm -rf $(xcode-select -print-path)
@@ -22,13 +22,13 @@ sudo xcode-select --reset
 xcode-select --install
 ```
 
-[スクリプトを実行](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#the-acid-test)して確認
+[スクリプトを実行](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#the-acid-test)して確認。
 
 ```sh
 curl -sL https://github.com/nodejs/node-gyp/raw/master/macOS_Catalina_acid_test.sh | bash
 ```
 
-xcodeの再インストールをしてもエラーになる場合は[I did all that and the acid test still does not pass :-(](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#i-did-all-that-and-the-acid-test-still-does-not-pass--)6の以降を試す
+xcodeの再インストールをしてもエラーになる場合は[I did all that and the acid test still does not pass :-(](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#i-did-all-that-and-the-acid-test-still-does-not-pass--)6の以降を試す。
 
 ## 原因
 
@@ -38,7 +38,7 @@ xcodeの再インストールをしてもエラーになる場合は[I did all t
 
 ## 試したが有効ではなかった
 
-xcodeのインストールを実行したが、インストール済みと表示された
+xcodeのインストールを実行したが、インストール済みと表示された。
 
 ```sh
 % xcode-select --install
@@ -46,7 +46,7 @@ xcodeのインストールを実行したが、インストール済みと表示
 xcode-select: error: command line tools are already installed, use "Software Update" to install updates
 ```
 
-rootユーザーでxcodeをリセットしてインストールし直したが、変わらず
+rootユーザーでxcodeをリセットしてインストールし直したが、変わらず。
 
 ```sh
 % xcode-select --reset
@@ -59,11 +59,11 @@ xcode-select: error: --reset must be run as root (e.g. `sudo xcode-select --rese
 xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
 ```
 
-AppStoreでxcodeのインストールしようとするが、カタリナではできなかった
+AppStoreでxcodeのインストールしようとするが、カタリナではできなかった。
 
 ![xcode installation error](./app_store.png)
 
-node-gypのグローバルインストールは成功するが、xcode自体が見つからない問題は解決できない
+node-gypのグローバルインストールは成功するが、xcode自体が見つからない問題は解決できない。
 
 ```sh
 % npm install -g node-gyp

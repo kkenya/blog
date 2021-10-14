@@ -16,14 +16,14 @@ status: published
 
 ## 結論
 
-gitの変数 `core.hooksPath` を削除する
+gitの変数 `core.hooksPath` を削除する。
 
 ```sh
 # これで core.hooksPathも削除される
 npx husky uninstall
 ```
 
-または
+または、gitの設定を変更する。
 
 ```sh
 git config --unset core.hooksPath
@@ -32,9 +32,9 @@ git config --unset core.hooksPath
 ## 調査したときのログ
 
 ざっくりとした理解だが、huskyは[githook](https://git-scm.com/docs/githooks)を利用してコミット前、プッシュ前などのアクションで対応したファイルが実行される。
-デフォルトでは `.git/hooks` ディレクトリにある `pre-commit` , `pre-push` などのアクション名に対応したファイルが実行される。  
+デフォルトでは `.git/hooks` ディレクトリにある `pre-commit` , `pre-push` などのアクション名に対応したファイルが実行される。
 
-`.git/hooks` 配下には今回リポジトリで設定していた `pre-commit` が存在しているので確認すると `.git/husky.sh` を実行していた
+`.git/hooks` 配下には今回リポジトリで設定していた `pre-commit` が存在しているので確認すると `.git/husky.sh` を実行していた。
 
 ```sh
 % bat .git/hooks/pre-commit
@@ -61,7 +61,7 @@ commit-msg      husky.sh        post-checkout    post-merge   post-update   pre-
 ```
 
 huskyの設定は問題なさそうなのでhuskyの生成したファイル自体が実行されていなさそう。
-githooksのドキュメントを確認すると core.hooksPath を設定することでhooksのディレクトリを変更できるとのこと
+githooksのドキュメントを確認すると `core.hooksPath` を設定することでhooksのディレクトリを変更できる。
 
 >By default the hooks directory is $GIT_DIR/hooks, but that can be changed via the core.hooksPath configuration variable
 
@@ -83,7 +83,7 @@ githooksのドキュメントを確認すると core.hooksPath を設定する�
 ───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 ```
 
-core.hooksPathの設定をなくし(直接ファイルから削除してもいい)、commitすると以前と同じようにhooksが実行された
+`core.hooksPath` の設定をなくし（直接ファイルから削除してもいい）、commitすると以前と同じようにhooksが実行された。
 
 ```sh
 % git config --unset core.hooksPath
@@ -99,4 +99,4 @@ husky > pre-commit (node v14.17.6)
 npx husky install
 ```
 
-npxで実行されるhuskyは最新のものを利用している？　`core.hooksPath` を設定するのはgithooks v2を利用するようになったv5以降。現状v4を利用しているためデフォルトの `.git/hooks` 配下のファイルを実行して欲しいが、hooksのディレクトリとしてhuskyが生成する独自ディレクトリを参照、設定自体はv4のままなのでファイルがなくhooksが実行されていないような挙動となっていた。
+npxでhusky installを実行した場合4系の設定が反映されない。 `core.hooksPath` を設定するのはgithooks v2を利用するようになったv5以降。v4を利用しているためデフォルトの `.git/hooks` 配下のファイルを実行して欲しいが、`core.hooksPath` にhuskyの生成する独自ディレクトリが指定される。設定自体はv4のままなので参照先に設定ファイルは存在せず、hooksが実行されていないような挙動となっていた。
