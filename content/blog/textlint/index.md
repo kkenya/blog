@@ -22,6 +22,11 @@ npm i -D textlint-rule-preset-ja-technical-writing textlint-rule-preset-jtf-styl
 
 [textlint-rule-spellcheck-tech-word](https://github.com/azu/textlint-rule-spellcheck-tech-word)が非推奨となり、[@proofdict/textlint-rule-proofdict](https://github.com/proofdict/proofdict/tree/master/packages/%40proofdict/textlint-rule-proofdict)の利用が推奨されていた。
 
+## git hooks
+
+pre-push でfix
+エラーは無視する
+
 ## vscode拡張機能
 
 workspaceかグローバルにtextlintをインストールしていれば、設定ファイルを読み込み、リアルタイムでtextlintを実行できる。

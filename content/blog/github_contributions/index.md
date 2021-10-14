@@ -8,8 +8,8 @@ status: draft
 
 ### field
 
-オブジェクトの要素。graphql へのデータ取得はクエリにオブジェクトとそのフィールドを指定することで対応するデータを取得できる。
-GraphQL のチュートリアルを参考にするとヒーローオブジェクトがあるとすると
+オブジェクトの要素。graphqlへのデータ取得はクエリにオブジェクトとそのフィールドを指定することで対応するデータを取得できる。
+GraphQLのチュートリアルを参考にするとヒーローオブジェクトがあるとすると
 
 つまり全てのフィールドを明示する
 
@@ -30,7 +30,7 @@ const user = {
 }
 ```
 
-query は
+queryは
 
 ```js
 {
@@ -92,7 +92,7 @@ const user = {
 
 ## arguments
 
-field を指定して検索する。
+fieldを指定して検索する。
 
 ```js
 {
@@ -114,7 +114,7 @@ field を指定して検索する。
 
 ## aliases
 
-field の取得結果を命名できる。同じ field を取得するが、argument が異なる場合などに用いる
+fieldの取得結果を命名できる。同じfieldを取得するが、argumentが異なる場合などに用いる
 
 ```js
 {
@@ -141,7 +141,7 @@ field の取得結果を命名できる。同じ field を取得するが、argu
 
 ## github v4
 
-graphQL スキーマは「queries」と「mutations」両方の root type をもつ。query はサーバーからデータを取得する GraphQL operations を定義する
+graphQLスキーマは「queries」と「mutations」両方のroot typeをもつ。queryはサーバーからデータを取得するGraphQL operationsを定義する
 
 ### user を取得するクエリ
 
@@ -157,7 +157,7 @@ query UserLogin {
 
 > Lookup a user by login.
 
-login field を User の schema から確認。
+login fieldをUserのschemaから確認。
 
 > The username used to login.
 

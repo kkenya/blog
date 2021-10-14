@@ -17,15 +17,15 @@ clientが指定するcallbackurlやスコープと違い認可サーバーが割
 
 ### 認可コードによる付与方式(Authorization Code Grant Type)
 
-付与方式(Authorization Grant)
+付与方式（Authorization Grant)
 一般的には「OAuthフロー」として知られる
 
-- 認可コードによる付与方式(Authorization Code Grant Type)
-- インプリシット付与方式(Implicit Grant Type)
+- 認可コードによる付与方式（Authorization Code Grant Type)
+- インプリシット付与方式（Implicit Grant Type)
   - クライアントがブラウザ内にあるため、フロント・チャネルのみ使われる
-- クライアント・クレデンシャルによる付与方式(Client Credentials Grant Type)
+- クライアント・クレデンシャルによる付与方式（Client Credentials Grant Type)
 
-基本的な認可コードによる付与方式(Authorization Code Grant Type)を利用
+基本的な認可コードによる付与方式（Authorization Code Grant Type)を利用
 
 アクセス・トークンを提示し、保護対象リソースを呼び出す
 
