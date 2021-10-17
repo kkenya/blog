@@ -3,13 +3,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: |
   ACM certificate for cloudFront.
   create in US East(N. Virginia)us-east-1.
-  this CFn depends on route53.
+  cross region is not supported. so specify domain name directly.
 
 Parameters:
-  RootServiceName:
+  DomainName:
     Type: String
-    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
-    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+    Description: domain name
+    Default: example.com
+    AllowedPattern: "^[a-zA-Z]+\\.[a-zA-Z]+$"
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -17,29 +18,21 @@ Metadata:
       - Label:
           default: ACM Configuration
         Parameters:
-          - RootServiceName
+          - DomainName
 
 Resources:
   Certificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName:
-        Fn::ImportValue: !Sub
-          - ${RootServiceName}PublicHostedZoneName
-          - RootServiceName: !Ref RootServiceName
+      DomainName: !Ref DomainName
       SubjectAlternativeNames:
         - !Sub
           - '*.${DomainName}'
-          - DomainName:
-              Fn::ImportValue: !Sub
-                - '${RootServiceName}PublicHostedZoneName'
-                - RootServiceName: !Ref RootServiceName
+          - DomainName: !Ref DomainName
       Tags:
         - Key: Name
           Value: !Sub
             - acm certificate for ${DomainName}
-            - DomainName:
-                Fn::ImportValue: !Sub
-                  - ${RootServiceName}PublicHostedZoneName
-                  - RootServiceName: !Ref RootServiceName
+            - DomainName: !Ref DomainName
+
       ValidationMethod: DNS

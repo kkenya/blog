@@ -18,9 +18,12 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Route53 Configuration
+          default: Service Configuration
         Parameters:
           - RootServiceName
+      - Label:
+          default: Route53 Configuration
+        Parameters:
           - DomainName
 
 Resources:
