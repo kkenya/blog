@@ -1,11 +1,28 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
-Description: create s3 bucket
+Description: |
+  create S3 public bucket.
 
-Mappings:
-  S3BucketMap:
-    Assets:
-      Name: blog.gekishaman.work
+Parameters:
+  ServiceName:
+    Type: String
+    Description: upercase service name. export or import resource like ${ServiceName}AssetsS3BucketName
+    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+  PublicBucketName:
+    Type: String
+    Description: public bucket name. it is recommended to use domain name.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - ServiceName
+      - Label:
+          default: S3 Configuration
+        Parameters:
+          - PublicBucketName
 
 Resources:
   AssetsS3Bucket:
@@ -13,7 +30,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      BucketName: !FindInMap ['S3BucketMap', 'Assets', 'Name']
+      BucketName: !Ref PublicBucketName
       LifecycleConfiguration:
         Rules:
           - Id: NoncurrentVersionExpiration
@@ -36,7 +53,7 @@ Resources:
       AccessControl: LogDeliveryWrite
       BucketName: !Sub
         - '${AssetsS3BacketName}-accesslogs'
-        - AssetsS3BacketName: !FindInMap ['S3BucketMap', 'Assets', 'Name']
+        - AssetsS3BacketName: !Ref PublicBucketName
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -56,23 +73,31 @@ Resources:
           Value: !Sub '${AWS::StackName}-accesslog-bucket'
 
 Outputs:
-  BlogAssetsS3BucketName:
-    Description: blog assets s3 bucket name
+  AssetsS3BucketName:
+    Description: assets s3 bucket name
     Value: !Ref AssetsS3Bucket
     Export:
-      Name: BlogAssetsS3BucketName
-  BlogAssetsS3BucketDomainName:
-    Description: blog assets s3 bucket domain name
+      Name: !Sub
+        - ${ServiceName}AssetsS3BucketName
+        - ServiceName: !Ref ServiceName
+  AssetsS3BucketDomainName:
+    Description: assets s3 bucket domain name
     Value: !GetAtt AssetsS3Bucket.DomainName
     Export:
-      Name: BlogAssetsS3BucketDomainName
-  BlogAccesslogS3BucketName:
-    Description: blog accesslog s3 bucket name
+      Name: !Sub
+        - ${ServiceName}AssetsS3BucketDomainName
+        - ServiceName: !Ref ServiceName
+  AccesslogS3BucketName:
+    Description: accesslog s3 bucket name
     Value: !Ref S3BucketAccesslog
     Export:
-      Name: BlogAccesslogS3BucketName
-  BlogAccesslogS3BucketDomainName:
-    Description: blog accesslog s3 bucket domain name
+      Name: !Sub
+        - ${ServiceName}AccesslogS3BucketName
+        - ServiceName: !Ref ServiceName
+  AccesslogS3BucketDomainName:
+    Description: accesslog s3 bucket domain name
     Value: !GetAtt S3BucketAccesslog.DomainName
     Export:
-      Name: BlogAccesslogS3BucketDomainName
+      Name: !Sub
+        - ${ServiceName}AccesslogS3BucketDomainName
+        - ServiceName: !Ref ServiceName
