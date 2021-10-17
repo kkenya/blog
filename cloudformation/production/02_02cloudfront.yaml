@@ -1,0 +1,141 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  create CloudFront and sub domain record set.
+  this stack depends on Route53, ACM and S3.
+  certification is created in in US East(N. Virginia)us-east-1. so specify ACM certificate ARN directly.
+
+Parameters:
+  RootServiceName:
+    Type: String
+    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
+    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+  ServiceName:
+    Type: String
+    Description: upercase service name. export or import resource like ${ServiceName}AssetsS3BucketName
+    AllowedPattern: '^[A-Z][a-zA-Z]+$'
+  AcmCertificateArn:
+    Type: String
+    Description: ACM certificate ARN(Amazon Resource Name)
+  LastDomainName:
+    Type: String
+    Description: last string for subdomain. substituted like ${LastDomainName}.example.com
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - RootServiceName
+          - ServiceName
+      - Label:
+          default: Route53 Configuration
+        Parameters:
+          - LastDomainName
+      - Label:
+          default: ACM Configuration
+        Parameters:
+          - AcmCertificateArn
+
+Resources:
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: S3Origin
+            DomainName:
+              Fn::ImportValue: !Sub
+                - ${ServiceName}AssetsS3BucketDomainName
+                - ServiceName: !Ref ServiceName
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub
+                - origin-access-identity/cloudfront/${OriginAccessIdentityId}
+                - OriginAccessIdentityId: !Ref CloudFrontOriginAccessIdentity
+        Enabled: true
+        DefaultRootObject: index.html
+        Logging:
+          IncludeCookies: false
+          Bucket:
+            Fn::ImportValue: !Sub
+              - ${ServiceName}AccesslogS3BucketDomainName
+              - ServiceName: !Ref ServiceName
+          Prefix: !Sub CloudFront/${AWS::StackName}
+        CustomErrorResponses:
+          - ErrorCachingMinTTL: 0
+            ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        Comment: 'cloudfront distribution of assets'
+        DefaultCacheBehavior:
+          Compress: true
+          ForwardedValues:
+            QueryString: false
+          DefaultTTL: 300
+          MaxTTL: 300
+          MinTTL: 300
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+        Aliases:
+          - !Sub
+            - '${LastDomainName}.${HostedZoneName}'
+            - LastDomainName: !Ref LastDomainName
+              HostedZoneName:
+                Fn::ImportValue: !Sub
+                  - ${RootServiceName}PublicHostedZoneName
+                  - RootServiceName: !Ref RootServiceName
+        ViewerCertificate:
+          MinimumProtocolVersion: TLSv1.2_2021 # recommended
+          SslSupportMethod: sni-only #  server name indication (SNI)
+          AcmCertificateArn: !Ref AcmCertificateArn
+        HttpVersion: http2
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-cloudfront'
+
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'distoributoin OAI'
+
+  AssetsS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Fn::ImportValue: !Sub
+          - ${ServiceName}AssetsS3BucketName
+          - ServiceName: !Ref ServiceName
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub
+              - arn:aws:s3:::${S3BucketName}/*
+              - S3BucketName:
+                  Fn::ImportValue: !Sub
+                    - ${ServiceName}AssetsS3BucketName
+                    - ServiceName: !Ref ServiceName
+            Principal:
+              AWS: !Sub arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${CloudFrontOriginAccessIdentity}
+
+  RecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !GetAtt CloudFrontDistribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+      Comment: sub domian record set
+      HostedZoneId:
+        Fn::ImportValue: !Sub
+          - ${RootServiceName}PublicHostedZoneId
+          - RootServiceName: !Ref RootServiceName
+      Name: !Sub
+        - '${LastDomainName}.${HostedZoneName}'
+        - LastDomainName: !Ref LastDomainName
+          HostedZoneName:
+            Fn::ImportValue: !Sub
+              - ${RootServiceName}PublicHostedZoneName
+              - RootServiceName: !Ref RootServiceName
+      Type: A
