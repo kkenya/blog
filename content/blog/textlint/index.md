@@ -1,5 +1,5 @@
 ---
-title: textlintの導入
+title: textlintを導入した
 date: "2018-11-23T23:32:43+09:00"
 status: draft
 ---
@@ -29,6 +29,11 @@ workspaceかグローバルにtextlintをインストールしていれば、設
 [vscode-textlint](https://marketplace.visualstudio.com/items?itemName=taichi.vscode-textlint)
 
 拡張機能のfixが利用できない。
+
+## pre-push
+
+fixを実行
+失敗してもpushしたい
 
 ## GitHub Actionsで強制する
 ## 参考
