@@ -3,10 +3,25 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: |
   create hosted zone
 
-Mappings:
-  ZoneMap:
-    PublicHostedZone:
-      Name: gekishaman.work
+Parameters:
+  RootServiceName:
+    Type: String
+    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
+    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+  DomainName:
+    Type: String
+    Description: domain name
+    Default: example.com
+    AllowedPattern: "^[a-zA-Z]+\\.[a-zA-Z]+$"
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Route53 Configuration
+        Parameters:
+          - RootServiceName
+          - DomainName
 
 Resources:
   PublicHostedZone:
@@ -14,7 +29,7 @@ Resources:
     Properties:
       HostedZoneConfig:
         Comment: Public Hosted Zone
-      Name: !FindInMap [ZoneMap, PublicHostedZone, Name]
+      Name: !Ref DomainName
       HostedZoneTags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-public-hosted-zone'
@@ -24,9 +39,13 @@ Outputs:
     Description: public hosted zone id
     Value: !Ref PublicHostedZone
     Export:
-      Name: PublicHostedZoneId
+      Name: !Sub
+        - ${RootServiceName}PublicHostedZoneId
+        - RootServiceName: !Ref RootServiceName
   PublicHostedZoneName:
     Description: public hosted zone name
-    Value: !FindInMap [ZoneMap, PublicHostedZone, Name]
+    Value: !Ref DomainName
     Export:
-      Name: PublicHostedZoneName
+      Name: !Sub
+        - ${RootServiceName}PublicHostedZoneName
+        - RootServiceName: !Ref RootServiceName
