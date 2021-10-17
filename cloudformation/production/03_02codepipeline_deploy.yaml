@@ -3,15 +3,43 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: |
   create CodePipeline to deploy static site
   use lower case for stackname
+  this stack depends on CodeStar and S3.
 
-Mappings:
-  SiteMap:
-    Blog:
-      Name: blog
-  GitHubMapping:
-    Repository:
-      FullRepositoryId: kkenya/blog
-      BranchName: main
+Parameters:
+  ServiceName:
+    Type: String
+    Description: upercase service name. export or import resource like ${ServiceName}SourceConnectionARN
+    AllowedPattern: '^[A-Z][a-zA-Z]+$'
+  GitHubFullRepositoryId:
+    Type: String
+    Description: GitHub full repository id. specify account and repository name like user/repo
+    AllowedPattern: '^[a-zA-Z0-9]+/[a-zA-Z0-9]+$'
+  BranchName:
+    Type: String
+    Default: main
+    Description: target branch name
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - ServiceName
+      - Label:
+          default: GitHub Configuration
+        Parameters:
+          - GitHubFullRepositoryId
+          - BranchName
+
+# Mappings:
+#   SiteMap:
+#     Blog:
+#       Name: blog
+#   GitHubMapping:
+#     Repository:
+#       FullRepositoryId: kkenya/blog
+#       BranchName: main
 
 Resources:
   DeployPipeline:
@@ -33,11 +61,9 @@ Resources:
                 ConnectionArn:
                   Fn::ImportValue: !Sub
                     - ${ServiceName}SourceConnectionARN
-                    - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
-                FullRepositoryId:
-                  !FindInMap ['GitHubMapping', 'Repository', 'FullRepositoryId']
-                BranchName:
-                  !FindInMap ['GitHubMapping', 'Repository', 'BranchName']
+                    - ServiceName: !Ref ServiceName
+                FullRepositoryId: !Ref GitHubFullRepositoryId
+                BranchName: !Ref BranchName
                 OutputArtifactFormat: CODE_ZIP # default
                 DetectChanges: true # Controls automatically starting your pipeline when a new commit is made on the configured repository and branch. If unspecified, the default value is true
               Name: SourceAction
@@ -72,7 +98,10 @@ Resources:
                 Provider: S3
                 Version: '1'
               Configuration:
-                BucketName: !ImportValue BlogAssetsS3BucketName
+                BucketName:
+                  Fn::ImportValue: !Sub
+                    - ${ServiceName}AssetsS3BucketName
+                    - ServiceName: !Ref ServiceName
                 Extract: true
               InputArtifacts:
                 - Name: BuildArtifact
@@ -113,7 +142,7 @@ Resources:
                 Resource:
                   - Fn::ImportValue: !Sub
                       - ${ServiceName}SourceConnectionARN
-                      - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+                      - ServiceName: !Ref ServiceName
                 Action:
                   - codestar-connections:UseConnection
               - Sid: S3ArtifactAnyPolicy
@@ -135,7 +164,10 @@ Resources:
                 Resource:
                   - !Sub
                     - 'arn:${AWS::Partition}:s3:::${BucketName}/*'
-                    - BucketName: !ImportValue BlogAssetsS3BucketName
+                    - BucketName:
+                        Fn::ImportValue: !Sub
+                          - ${ServiceName}AssetsS3BucketName
+                          - ServiceName: !Ref ServiceName
                 Action:
                   - s3:*
       Tags:
@@ -239,7 +271,7 @@ Resources:
         - codepipeline-pipeline-pipeline-execution-superseded
       Name: !Sub
         - '${ServiceName}TestNotificationRule'
-        - ServiceName: !FindInMap [SiteMap, Blog, Name]
+        - ServiceName: !Ref ServiceName
       Resource: !Sub
         - arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}
         - PipelineName: !Ref DeployPipeline
@@ -252,16 +284,16 @@ Resources:
     Type: AWS::SNS::Topic
     Properties:
       DisplayName: !Sub
-        - ${Site}DeployNotification
-        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+        - ${ServiceName}DeployNotification
+        - ServiceName: !Ref ServiceName
       Tags:
         - Key: Name
           Value: !Sub
-            - ${Site}DeployNotification
-            - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+            - ${ServiceName}DeployNotification
+            - ServiceName: !Ref ServiceName
       TopicName: !Sub
-        - ${Site}DeployNotification
-        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+        - ${ServiceName}DeployNotification
+        - ServiceName: !Ref ServiceName
 
   NotificationTopicPolicy:
     Type: AWS::SNS::TopicPolicy
@@ -287,4 +319,4 @@ Outputs:
     Export:
       Name: !Sub
         - ${ServiceName}NotificationTopicArn
-        - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+        - ServiceName: !Ref ServiceName

@@ -1,9 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: |
-  connect source
+  create CodeStarConnections that connect GitHub repository.
+  you must authorization access for GitHub on AWS Console after stack created.
 
 Parameters:
+  ServiceName:
+    Type: String
+    Description: upercase service name. export or import resource like ${ServiceName}SourceConnectionARN
+    AllowedPattern: '^[A-Z][a-zA-Z]+$'
   ProviderType:
     Type: String
     Default: GitHub
@@ -12,10 +17,17 @@ Parameters:
       - GitHub
       - GitHubEnterpriseServer
 
-Mappings:
-  SiteMap:
-    Blog:
-      Name: blog
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - ServiceName
+      - Label:
+          default: CodeStar Configuration
+        Parameters:
+          - ProviderType
 
 Resources:
   # https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-codestarconnections-connection.html
@@ -31,4 +43,4 @@ Outputs:
     Export:
       Name: !Sub
         - ${ServiceName}SourceConnectionARN
-        - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+        - ServiceName: !Ref ServiceName
