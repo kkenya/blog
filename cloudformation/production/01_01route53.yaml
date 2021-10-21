@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  create hosted zone
+
+Parameters:
+  RootServiceName:
+    Type: String
+    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
+    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+  DomainName:
+    Type: String
+    Description: domain name
+    Default: example.com
+    AllowedPattern: "^[a-zA-Z]+\\.[a-zA-Z]+$"
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - RootServiceName
+      - Label:
+          default: Route53 Configuration
+        Parameters:
+          - DomainName
+
+Resources:
+  PublicHostedZone:
+    Type: 'AWS::Route53::HostedZone'
+    Properties:
+      HostedZoneConfig:
+        Comment: Public Hosted Zone
+      Name: !Ref DomainName
+      HostedZoneTags:
+        - Key: Name
+          Value: !Sub '${AWS::StackName}-public-hosted-zone'
+
+Outputs:
+  PublicHostedZoneId:
+    Description: public hosted zone id
+    Value: !Ref PublicHostedZone
+    Export:
+      Name: !Sub
+        - ${RootServiceName}PublicHostedZoneId
+        - RootServiceName: !Ref RootServiceName
+  PublicHostedZoneName:
+    Description: public hosted zone name
+    Value: !Ref DomainName
+    Export:
+      Name: !Sub
+        - ${RootServiceName}PublicHostedZoneName
+        - RootServiceName: !Ref RootServiceName

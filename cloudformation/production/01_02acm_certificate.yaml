@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  ACM certificate for cloudFront.
+  create in US East(N. Virginia)us-east-1.
+  cross region is not supported. so specify domain name directly.
+
+Parameters:
+  DomainName:
+    Type: String
+    Description: domain name
+    Default: example.com
+    AllowedPattern: "^[a-zA-Z]+\\.[a-zA-Z]+$"
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: ACM Configuration
+        Parameters:
+          - DomainName
+
+Resources:
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub
+          - '*.${DomainName}'
+          - DomainName: !Ref DomainName
+      Tags:
+        - Key: Name
+          Value: !Sub
+            - acm certificate for ${DomainName}
+            - DomainName: !Ref DomainName
+
+      ValidationMethod: DNS

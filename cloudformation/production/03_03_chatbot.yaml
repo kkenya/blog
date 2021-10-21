@@ -1,14 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
 Description: |
-  create chatbot configuration for slack notification
-
-Mappings:
-  SiteMap:
-    Blog:
-      Name: blog
+  create Chatbot configuration for slack notification
+  this stack depends on CodePipeline.
+  you must create Chatbot workplace before creating this stack.
 
 Parameters:
+  ServiceName:
+    Type: String
+    Description: upercase service name. export or import resource like ${ServiceName}SourceConnectionARN
+    AllowedPattern: '^[A-Z][a-zA-Z]+$'
   NotificationSlackChannelId:
     Type: String
     Description: slack channel id for notification
@@ -20,6 +21,10 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
+          default: Service Configuration
+        Parameters:
+          - ServiceName
+      - Label:
           default: Chatbot Configuration
         Parameters:
           - NotificationSlackChannelId
@@ -30,8 +35,8 @@ Resources:
     Type: AWS::Chatbot::SlackChannelConfiguration
     Properties:
       ConfigurationName: !Sub
-        - ConfigrationOf${Site}DeployNotification
-        - Site: !FindInMap ['SiteMap', 'Blog', 'Name']
+        - ConfigrationOf${ServiceName}DeployNotification
+        - ServiceName: !Ref ServiceName
       IamRoleArn: !GetAtt NotificationRole.Arn
       LoggingLevel: INFO
       SlackChannelId: !Ref NotificationSlackChannelId
@@ -39,7 +44,7 @@ Resources:
       SnsTopicArns:
         - Fn::ImportValue: !Sub
             - ${ServiceName}NotificationTopicArn
-            - ServiceName: !FindInMap ['SiteMap', 'Blog', 'Name']
+            - ServiceName: !Ref ServiceName
 
   NotificationRole:
     Type: AWS::IAM::Role

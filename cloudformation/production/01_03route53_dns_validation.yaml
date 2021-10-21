@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: |
+  create record sets for dns validation of certification.
+  this stack depends on Route53.
+
+Parameters:
+  RootServiceName:
+    Type: String
+    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
+    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+  CertificateValidationRecordSetName:
+    Type: String
+    Description: cname record set's name for dns validation on ACM certificate
+  CertificateValidationRecordSetValue:
+    Type: String
+    Description: cname record set's value for dns validation on ACM certificate
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Service Configuration
+        Parameters:
+          - RootServiceName
+      - Label:
+          default: ACM Configuration
+        Parameters:
+          - CertificateValidationRecordSetName
+          - CertificateValidationRecordSetValue
+
+Resources:
+  CertificateValidationRecordSet:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      Comment: ACM certificate validation cname record set
+      HostedZoneId:
+        Fn::ImportValue: !Sub
+          - ${RootServiceName}PublicHostedZoneId
+          - RootServiceName: !Ref RootServiceName
+      Name: !Ref CertificateValidationRecordSetName
+      ResourceRecords:
+        - !Ref CertificateValidationRecordSetValue
+      Type: CNAME
+      TTL: 300
