@@ -4,7 +4,7 @@ date: "2021-01-01T00:00:00+09:00"
 status: draft
 ---
 
-converterの型定義
+## converterの型定義
 
 ```js
 export declare interface FirestoreDataConverter<T> {
@@ -56,6 +56,13 @@ SetOptionとは
 
 fromFirestoreの第一引数はsnapshot: QueryDocumentSnapshot<DocumentData>なのでアノテーションでドキュメントの方を指定する
 
+### overloadがめんどくさい
+
+そのままでは利用できない
+第1匹数の方に互換性がないため、arg1: PartialWithFieldValue<T>, options?: setOptionでoverloadではなく任意引数で対応する
+
+https://qiita.com/eyuta/items/cfe5880e396a2246f8c0#%E6%9C%AB%E5%B0%BE%E3%81%AE%E5%BC%95%E6%95%B0%E3%81%AE%E3%81%BF%E3%81%8C%E7%95%B0%E3%81%AA%E3%82%8B%E3%82%AA%E3%83%BC%E3%83%90%E3%83%BC%E3%83%AD%E3%83%BC%E3%83%89%E3%82%92%E5%AE%9A%E7%BE%A9%E3%81%97%E3%81%9F%E3%81%84%E5%A0%B4%E5%90%88%E3%81%AF%E4%BB%BB%E6%84%8F%E5%BC%95%E6%95%B0%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%99%E3%82%8B
+
 ## idの生成
 
 https://firebase.google.cn/docs/firestore/manage-data/add-data?hl=ja#add_a_document
@@ -78,3 +85,11 @@ objectを比較なら tostrictequal
 
 
 fakeTimeは？
+
+## ベストプラクティス
+
+
+https://cloud.google.com/firestore/docs/best-practices
+
+controllarのテスト
+バリデーションのmiddleware
