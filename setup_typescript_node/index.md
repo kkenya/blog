@@ -109,6 +109,86 @@ echo dist >> .gitignore
 mkdir src
 ```
 
+## フレームワーク
+
+APIには `express` 、変更をサーバーに即時反映するために `ts-node` を利用
+
+```shell
+npm i express
+npm i -D typescript ts-node @types/node @types/express
+```
+
+`app.ts` を追加
+
+```ts
+import express, { Request, Response } from "express";
+const app = express();
+const port = 3000;
+
+app.get("/", (_req: Request, res: Response) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});
+```
+
+`package.json` にローカル開発用のnpm scriptを追加
+
+```git
+   "scripts": {
++    "local": "ts-node src/app.ts",
+```
+
+サーバーを起動し、確認
+
+```shell
+npm run local
+```
+
+curlでレスポンスを確認
+
+```shell
+% curl localhost:3000
+Hello World!
+```
+
+## Docker化
+
+<!-- todo: 
+multi stage build
+docker compose v2 -->
+
+health check
+
+```dockerfile
+```
+
+npm ci
+package-lockから依存モジュールをインストールする
+NODE_NEVによってdevDependenciesをインストールする係る
+[npm-ci](https://docs.npmjs.com/cli/v8/commands/npm-ci)
+
+include=devでdevDependenciesを含める
+
+build: `target` でmutistagebuildのstageを指定する
+volume: ソースコードをマウントする
+comand: Dockerfileの `command` を上書きする
+depends_on: mongodbの立ち上げ後apiのコンテナを起動する。databaseへのfixtures投入などを待機する場合は[スクリプト](https://docs.docker.com/compose/startup-order/)を用意して対応する
+
+```docker-compose
+```
+
+- [docker compose file reference](https://docs.docker.com/compose/compose-file/compose-file-v3/)
+
+npm scriptを追加
+
+```js
+    "build": "tsc",
+```
+
+>>>>>>> c4bbebf (develop vscode extention):content/blog/setup_typescript_node/index.md
 ## testの追加
 
 テストライブラリにjest, mockにsinonを利用
@@ -133,3 +213,7 @@ sinonと型定義のインストール
 ```sh
 npm install --save-dev sinon @types/sinon
 ```
+
+ts-node-devでホットリロード
+ts-nodeではない
+[ts-node](https://www.npmjs.com/package/ts-node)

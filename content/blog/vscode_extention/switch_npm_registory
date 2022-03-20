@@ -1,0 +1,6 @@
+npm config set registry https://registry.npmjs.org/
+
+package-lock.json node_modulesを削除
+rm -rf package-lock.json node_modules
+
+npm i
