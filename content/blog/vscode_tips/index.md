@@ -1,5 +1,5 @@
 ---
-title: "mac tips"
+title: mac tips
 date: "2022-03-13T00:39:23+09:00"
 status: draft
 ---

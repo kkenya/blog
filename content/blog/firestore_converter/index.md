@@ -1,5 +1,5 @@
 ---
-title: ""
+title: firebaseのconverterで型安全にfiresoreを利用する
 date: "2021-01-01T00:00:00+09:00"
 status: draft
 ---

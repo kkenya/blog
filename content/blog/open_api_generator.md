@@ -1,5 +1,5 @@
 ---
-title: ""
+title: 
 date: "2020-02-04T22:51:23+09:00"
 status: draft
 ---
