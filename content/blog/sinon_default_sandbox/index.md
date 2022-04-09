@@ -1,7 +1,7 @@
 ---
 title: sinonオブジェクトがデフォルトでsandbox環境だった
 date: "2022-04-06T19:34:18+09:00"
-status: publish
+status: published
 ---
 
 ## 概要
