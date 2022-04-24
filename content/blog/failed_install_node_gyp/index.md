@@ -67,7 +67,7 @@ node-gypのグローバルインストールは成功するが、xcode自体が�
 
 ```sh
 % npm install -g node-gyp
-/Users/s06540/.nvm/versions/node/v14.17.6/bin/node-gyp -> /Users/s06540/.nvm/versions/node/v14.17.6/lib/node_modules/node-gyp/bin/node-gyp.js
+~/.nvm/versions/node/v14.17.6/bin/node-gyp -> ~/.nvm/versions/node/v14.17.6/lib/node_modules/node-gyp/bin/node-gyp.js
 + node-gyp@8.2.0
 added 93 packages from 33 contributors in 19.568s
 % curl -sL https://github.com/nodejs/node-gyp/raw/master/macOS_Catalina_acid_test.sh | bash

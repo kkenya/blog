@@ -43,7 +43,7 @@ Enter the root scope name of the grammar (e.g. source.ruby)
 ? Scope names: source.abc
 ? Initialize a git repository? Yes
 
-Writing in /Users/s06540/work/github.com/kkenya/abc-lang...
+Writing in ~/work/github.com/kkenya/abc-lang...
    create abc-lang/syntaxes/abc.tmLanguage.json
    create abc-lang/.vscode/launch.json
    create abc-lang/package.json

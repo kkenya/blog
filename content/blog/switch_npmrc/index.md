@@ -62,9 +62,9 @@ npmの設定ファイルである `.npmrc` の評価には4つの優先順位が
 └── work
     └── company1
         ├── project1 # ~/work/company1/project1/.npmrcが読み込まれる
-        │   └── .npmrc -> /Users/s06540/.npmrc.company1
+        │   └── .npmrc -> ~/.npmrc.company1
         └── project2 # ~/work/company1/project2/.npmrcが読み込まれる
-            └── .npmrc -> /Users/s06540/.npmrc.company1
+            └── .npmrc -> ~/.npmrc.company1
 ```
 
 対応として `.npmrc.company1` のように切り替えたい設定を記述した設定ファイルを用意し、適用させたいプロジェクト配下に `.npmrc` をシンボリックリンクで作成するシェルスクリプトを作成した
