@@ -46,7 +46,7 @@ git config --unset core.hooksPath
    3   │
    4   │ # Created by Husky v4.3.0 (https://github.com/typicode/husky#readme)
    5   │ #   At: 2021/10/7 11:26:24
-   6   │ #   From: /Users/s06540/work/github.com/cam-inc/fortune-env/repos/logic/node_modules/husky (https://github.com/typicode/husky#readme)
+   6   │ #   From: /Users/s06540/work/github.com/repo1/node_modules/husky (https://github.com/typicode/husky#readme)
    7   │
    8   │ . "$(dirname "$0")/husky.sh"
 ───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
