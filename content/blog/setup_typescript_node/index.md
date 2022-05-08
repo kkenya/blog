@@ -168,11 +168,7 @@ health check
 npm ci
 package-lockから依存モジュールをインストールする
 NODE_NEVによってdevDependenciesをインストールする係る
-<<<<<<< HEAD:setup_typescript_node/index.md
 [npm-ci](https://docs.npmjs.com/cli/v8/commands/npm-ci)
-=======
-https://docs.npmjs.com/cli/v8/commands/npm-ci
->>>>>>> f48b1c3 (wip):content/blog/setup_typescript_node/index.md
 
 include=devでdevDependenciesを含める
 
@@ -192,12 +188,7 @@ npm scriptを追加
     "build": "tsc",
 ```
 
-<<<<<<< HEAD:setup_typescript_node/index.md
->>>>>>> c4bbebf (develop vscode extention):content/blog/setup_typescript_node/index.md
-=======
->>>>>>> f48b1c3 (wip):content/blog/setup_typescript_node/index.md
 ## testの追加
-jkkjkkkkjj
 
 テストライブラリにjest, mockにsinonを利用
 
@@ -222,13 +213,6 @@ sinonと型定義のインストール
 npm install --save-dev sinon @types/sinon
 ```
 
-<<<<<<< HEAD:setup_typescript_node/index.md
 ts-node-devでホットリロード
 ts-nodeではない
 [ts-node](https://www.npmjs.com/package/ts-node)
-=======
-
-ts-node-devでホットリロード
-ts-nodeではない
-https://www.npmjs.com/package/ts-node
->>>>>>> f48b1c3 (wip):content/blog/setup_typescript_node/index.md
