@@ -86,7 +86,7 @@ readonly NPMRC=".npmrc.company1"
 directories=(`find $(pwd) -type d -mindepth 1 -maxdepth 1`)
 for dir in ${directories[@]}
 do
-    ln -s ${HOME}/${NPMRC} ${dir}/.npmrc 
+    ln -s ${HOME}/${NPMRC} ${dir}/.npmrc
 done
 ```
 
