@@ -1,7 +1,7 @@
 ---
 title: typescriptプロジェクトの立ち上げ
-date: "2021-01-01T00:00:00+09:00"
-status: draft
+date: "2021-03-08T01:42:44+09:00"
+status: published
 ---
 
 node16でtypescriptのプロジェクト作成手順を忘れるのでメモ
@@ -13,20 +13,23 @@ git init .
 echo node_modules > .gitignore
 ```
 
-npmの初期化とtypescript, ts-nodeのインストール
+npmの初期化と `typescript` のインストール。
 
 ```shell
 npm init -y
-npm i -D typescript ts-node @types/node
+npm i --save-dev typescript @types/node
+
 npx tsc --init
 ```
 
 ## tsconfig
 
-[TypeScript/wiki/Node-Target-Mapping](https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping)から今回利用するnode16に対応する値に`compilerOptions` を変更する。
-`target` はTypeScriptをトランスパイルした結果出力されるJavaScriptのバージョンを定義する。 `lib` を指定することでbuilt-inされるAPIの型定義が変更する。TypeScriptの型を十分に活用するために `noImplicit` 系統を設定。
+[TypeScript/wiki/Node-Target-Mapping](https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping)からnodeバージョンに対応する値に`compilerOptions` を変更する。
+今回はnode16に設定を利用。
+`target` はTypeScriptをトランスパイルした結果出力されるJavaScriptのバージョンを定義する。 `lib` を指定することでbuilt-inで利用できるAPIの型定義を指定する。
+オプショナルな設定として、TypeScriptの型の恩恵を十分に活用するために `noImplicit` 系統を設定。
 
-トランスパイル結果の出力先を `dist` に設定
+トランスパイル結果の出力先は `dist` に設定した。
 
 - [target](https://www.typescriptlang.org/tsconfig#target)
 - [lib](https://www.typescriptlang.org/tsconfig#lib)
@@ -103,116 +106,43 @@ index 5679481..0c1f40c 100644
 echo dist >> .gitignore
 ```
 
-## 作業ディレクトリの作成
+## ホットリロード
 
-```sh
+変更を監視し、即時反映するために `ts-node-dev` をインストールする。
+
+```shell
+npm i -save-dev ts-node-dev
+```
+
+ソースコードを `src` に配置し、エントリーポイントを　`src/app.js` に指定する。
+
+```shell
 mkdir src
 ```
 
-## フレームワーク
+`src/app.js`
 
-APIには `express` 、変更をサーバーに即時反映するために `ts-node` を利用
-
-```shell
-npm i express
-npm i -D typescript ts-node @types/node @types/express
-```
-
-`app.ts` を追加
-
-```ts
-import express, { Request, Response } from "express";
-const app = express();
-const port = 3000;
-
-app.get("/", (_req: Request, res: Response) => {
-  res.send("Hello World!");
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+```js
+console.log('Hello World')
 ```
 
 `package.json` にローカル開発用のnpm scriptを追加
 
 ```git
    "scripts": {
-+    "local": "ts-node src/app.ts",
++    "dev": "ts-node src/app.ts",
 ```
 
 サーバーを起動し、確認
 
 ```shell
-npm run local
+npm run dev
 ```
 
-curlでレスポンスを確認
+## feature
 
-```shell
-% curl localhost:3000
-Hello World!
-```
-
-## Docker化
-
-<!-- todo: 
-multi stage build
-docker compose v2 -->
-
-health check
-
-```dockerfile
-```
-
-npm ci
-package-lockから依存モジュールをインストールする
-NODE_NEVによってdevDependenciesをインストールする係る
-[npm-ci](https://docs.npmjs.com/cli/v8/commands/npm-ci)
-
-include=devでdevDependenciesを含める
-
-build: `target` でmutistagebuildのstageを指定する
-volume: ソースコードをマウントする
-comand: Dockerfileの `command` を上書きする
-depends_on: mongodbの立ち上げ後apiのコンテナを起動する。databaseへのfixtures投入などを待機する場合は[スクリプト](https://docs.docker.com/compose/startup-order/)を用意して対応する
-
-```docker-compose
-```
-
-- [docker compose file reference](https://docs.docker.com/compose/compose-file/compose-file-v3/)
-
-npm scriptを追加
-
-```js
-    "build": "tsc",
-```
-
-## testの追加
-
-テストライブラリにjest, mockにsinonを利用
-
-### jest
-
-jestと型定義のインストールとconfigファイルの生成
-
-```sh
-npm install --save-dev jest @types/jest ts-jest
-npx ts-jest config:init
-```
-
-```sh
-mkdir __tests__
-```
-
-### sinon
-
-sinonと型定義のインストール
-
-```sh
-npm install --save-dev sinon @types/sinon
-```
-
-ts-node-devでホットリロード
-ts-nodeではない
-[ts-node](https://www.npmjs.com/package/ts-node)
+- [husky](https://github.com/typicode/husky)
+  - git commit, push時での指定コマンドの実行
+- [lint-sgated](https://github.com/okonet/lint-staged)
+  - gitのstageに追加した変更(git addした変更)のみをlint対象にする
+- テスト
