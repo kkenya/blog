@@ -76,9 +76,10 @@ For more information, also visit http://code.visualstudio.com and follow us @cod
 
 ## デバッグ
 
-F5 でデバッグ
-新しいwindowが開く
-拡張機能を開発した場合は、Extention Development Hostで `Cmd + R`(または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` を実行)で変更を反映する
+`npm run watch` でソースコードの変更を監視して逐次トランスパイルを実行する
+
+`F5` でデバッグを実行すると、Extention Development Hostという名前で新しいvscodeのwindowが開く
+トランスパイルしたソースコードを、Extention Development Hostに反映させるのは `Cmd + R`(または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` )を実行する
 
 ### [Scope inspector](https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide#scope-inspector)
 
@@ -169,3 +170,30 @@ F5でデバッグ時にエラー
 変更が反映されない
 typescriptで開発しているので、javascriptに都度トランスパイルする必要がある
 `npm run compile` または `npm run watch` で変更を監視しましょう
+
+アイコンについて
+背景について
+
+画像をgitignoreの対象にしていて、パッケージ作成時に画像をバンドルできずエラーになった
+
+正規表現で遅くなった
+
+処理を実行するイベントについて
+テキストを開いた時に反映されない
+
+windowとworkspaceについて
+
+Eventの引数について
+https://code.visualstudio.com/api/references/vscode-api#EvaluatableExpressionProvider
+
+Event
+イベントを購読するリスナーを登録する
+lisner リスナーはイベントが発火した際に呼ばれる
+thisArgs イベントリスナーを呼び出した際に利用される
+disposables disposableが追加されるdisposableの配列
+返り値 disposable
+
+dispose 意味　廃棄
+
+Disposable
+イベントリスナーやタイマーのようなリソースを解放できるtypeを提供する
