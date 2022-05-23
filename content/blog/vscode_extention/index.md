@@ -1,7 +1,7 @@
 ---
 title: vscodeの拡張機能を開発する
 date: "2022-04-04T20:58:00+09:00"
-status: published
+status: dfaft
 ---
 
 Visual Studio Code(以下vscode)の拡張機能開発はMicrosoftが提供するジェネレーターを利用して `TypeScript` で記述する
@@ -80,7 +80,11 @@ For more information, also visit http://code.visualstudio.com and follow us @cod
 
 ## 開発
 
-ソースコードの変更を監視して逐次トランスパイルするため `npm run watch` を実行しておく
+`npm run watch` でソースコードの変更を監視して逐次トランスパイルを実行する
+
+`F5` でデバッグを実行すると、Extention Development Hostという名前で新しいvscodeのwindowが開く
+トランスパイルしたソースコードを、Extention Development Hostに反映させるのは `Cmd + R`(または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` )を実行する
+>>>>>>> adedc3c (wip)
 
 デバッグを実行( `F5` )すると、Extention Development Hostという名前で新しいvscodeのウインドウが開く
 ソースコードの変更を、Extention Development Hostに反映させるのは `Cmd + R` または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` を実行しリロードする
@@ -177,6 +181,39 @@ F5でデバッグ時にエラー
 ### vsce packageでエラーになる
 
 画像をgitignoreの対象にしていて、パッケージ作成時に画像をバンドルできずエラーになった
+
+### 困った
+
+変更が反映されない
+typescriptで開発しているので、javascriptに都度トランスパイルする必要がある
+`npm run compile` または `npm run watch` で変更を監視しましょう
+
+アイコンについて
+背景について
+
+画像をgitignoreの対象にしていて、パッケージ作成時に画像をバンドルできずエラーになった
+
+正規表現で遅くなった
+
+処理を実行するイベントについて
+テキストを開いた時に反映されない
+
+windowとworkspaceについて
+
+Eventの引数について
+https://code.visualstudio.com/api/references/vscode-api#EvaluatableExpressionProvider
+
+Event
+イベントを購読するリスナーを登録する
+lisner リスナーはイベントが発火した際に呼ばれる
+thisArgs イベントリスナーを呼び出した際に利用される
+disposables disposableが追加されるdisposableの配列
+返り値 disposable
+
+dispose 意味　廃棄
+
+Disposable
+イベントリスナーやタイマーのようなリソースを解放できるtypeを提供する
 
 ## 参考
 
