@@ -24,16 +24,16 @@ npx tsc --init
 
 ## tsconfig
 
-[TypeScript/wiki/Node-Target-Mapping](https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping)からnodeバージョンに対応する値に`compilerOptions` を変更する。
+`compilerOptions` を[TypeScript/wiki/Node-Target-Mapping](https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping)の利用するバージョンに対応する値に変更する。
 今回はnode16に設定を利用。
-`target` はTypeScriptをトランスパイルした結果出力されるJavaScriptのバージョンを定義する。 `lib` を指定することでbuilt-inで利用できるAPIの型定義を指定する。
-オプショナルな設定として、TypeScriptの型の恩恵を十分に活用するために `noImplicit` 系統を設定。
 
-トランスパイル結果の出力先は `dist` に設定した。
+|項目|説明
+|:--|:--|
+|[target](https://www.typescriptlang.org/tsconfig#target)|TypeScriptをトランスパイルした結果出力されるJavaScriptのバージョンを定義|
+|[lib](https://www.typescriptlang.org/tsconfig#lib)|built-inで利用できるAPIの型定義を指定|
+|[outDir](https://www.typescriptlang.org/tsconfig)|トランスパイル結果の出力先|
 
-- [target](https://www.typescriptlang.org/tsconfig#target)
-- [lib](https://www.typescriptlang.org/tsconfig#lib)
-- [outDir](https://www.typescriptlang.org/tsconfig)
+TypeScriptの型の恩恵を十分に活用するために `noImplicit` 系統を有効化
 
 ```git
 diff --git a/tsconfig.json b/tsconfig.json
@@ -120,29 +120,73 @@ npm i -save-dev ts-node-dev
 mkdir src
 ```
 
-`src/app.js`
+`src/app.ts`
 
 ```js
 console.log('Hello World')
 ```
 
-`package.json` にローカル開発用のnpm scriptを追加
+`package.json` にローカル開発用のnpm scriptを追加する
+`console.log` のような実行後プロセスが終了するスクリプトの場合は `--respawn` オプションを有効にする
 
-```git
-   "scripts": {
-+    "dev": "ts-node src/app.ts",
+```shell
+npm set-script dev "ts-node-dev --respawn src/app.ts"
 ```
 
-サーバーを起動し、確認
+実行後、ファイルを変更して確認する
 
 ```shell
 npm run dev
 ```
 
+## prettier
+
+`prettier` を利用し、コードのスタイリングを統一する
+
+```shell
+npm install --save-dev --save-exact prettier
+```
+
+設定ファイルは複数の[拡張子をサポートしている](https://prettier.io/docs/en/configuration.html)。記述が簡潔になるためyamlを利用
+
+```shell
+echo 'singleQuote: true' > .prettierrc.yaml
+```
+
+カレントディレクトリ配下を整形する
+
+```shell
+npx prettier --write .
+```
+
+### Git Hooks
+
+`husky` , `lint-staged` によりコミット前の変更箇所のみに `prettier` を実行する
+
+|package|description|
+|:--|:--|
+|[husky](https://github.com/typicode/husky)|commit前(pre-commit)などgitコマンドにフックして任意のコマンドを実行できる|
+|[lint-sgated](https://github.com/okonet/lint-staged)|gitのstagingエリアに追加したファイルのみをlinterの対象とすることができる(ファイル全体にlinterを実行しないため早い、無関係の変更を含まない)|
+
+[ドキュメント](https://prettier.io/docs/en/install.html#git-hooks)に沿ってcommit時に `lint-staged` から変更ファイルのみに `prettier` の整形を適用させる
+
+```shell
+npm install --save-dev husky lint-staged
+npx husky install
+npm set-script prepare "husky install"
+npx husky add .husky/pre-commit "npx lint-staged"
+```
+
+package.jsonか設定ファイルにlint-stagedの設定を追加する。
+今回は変更ファイルに対して prettierを実行するように `.lintstagedrc.yaml` を作成。
+`--ignore-unknown` を指定することで `.husky/pre-commit` などprettierの対応していないフォーマットを無視する
+
+```yaml
+'**/*': 'prettier --write --ignore-unknown'
+```
+
 ## feature
 
-- [husky](https://github.com/typicode/husky)
-  - git commit, push時での指定コマンドの実行
-- [lint-sgated](https://github.com/okonet/lint-staged)
-  - gitのstageに追加した変更(git addした変更)のみをlint対象にする
-- テスト
+- eslint
+  - pre-commit
+- test
