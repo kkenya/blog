@@ -117,7 +117,78 @@ npm i -D js-yaml
 
 ## パッケージの公開
 
+なぜvsceが必要なのか書く
+
+webpackでビルドされ、
+パッケージ名とパッケージバージョンから拡張機能がビルドされる
+
+package.name mermaid-sequence-number
+versoin: 1.0.0
+result: mermaid-sequence-number-1.0.0.vsix
+
+```shell
+% npm run package
+
+> mermaid-sequence-number@1.2.0 package
+> webpack --mode production --devtool hidden-source-map
+
+    [webpack-cli] Compiler starting...
+    [webpack-cli] Compiler is using config: '/Users/s06540/work/github.com/kkenya/mermaid-editor-sequence-number/webpack.config.js'
+    [webpack-cli] Compiler finished
+asset extension.js 84.7 KiB [emitted] [minimized] (name: main) 1 related asset
+orphan modules 230 KiB [orphan] 53 modules
+runtime modules 670 bytes 3 modules
+built modules 237 KiB [built]
+  ./src/extension.ts 7.47 KiB [built] [code generated]
+  ./node_modules/mdast-util-from-markdown/index.js + 52 modules 230 KiB [built] [code generated]
+  external "vscode" 42 bytes [built] [code generated]
+webpack 5.72.0 compiled successfully in 2654 ms
+```
+
 パッケージ化には `vsce` を利用する。
+プロジェクトの作成
+パーソナルアクセストークンの発行
+
+```shell
+% vsce login kkenya
+Publisher 'kkenya' is already known
+Do you want to overwrite its PAT? [y/N] y
+https://marketplace.visualstudio.com/manage/publishers/
+Personal Access Token for publisher 'kkenya': ****************************************************
+
+The Personal Access Token verification succeeded for the publisher 'kkenya'.
+ INFO
+The latest version of vsce is 2.8.0 and you have 2.7.0.
+Update it now: npm install -g vsce
+```
+
+```shell
+npm install -g vsce
+```
+
+vsceによるパッケージの生成。packageコマンドとの違いは？
+
+```shell
+npm run prepublish
+```
+
+publishの実行
+
+```shell
+npm run publish
+```
+
+### personal access tokenの有効期限が切れていた
+
+```shell
+ INFO  Publishing 'kkenya.mermaid-sequence-number v1.2.0'...
+ ERROR  {"$id":"1","customProperties":{"Descriptor":null,"IdentityDisplayName":null,"Token":null,"RequestedPermissions":0,"NamespaceId":"00000000-0000-0000-0000-000000000000"},"innerException":null,"message":"Access Denied: The Personal Access Token used has expired.","typeName":"Microsoft.VisualStudio.Services.Security.AccessCheckException, Microsoft.VisualStudio.Services.WebApi","typeKey":"AccessCheckException","errorCode":0,"eventId":3000}
+
+You're using an expired Personal Access Token, please get a new PAT.
+More info: https://aka.ms/vscodepat
+```
+
+## メモ
 
 colorize participant, actor
 apply sequencial number to editor
@@ -197,3 +268,23 @@ dispose 意味　廃棄
 
 Disposable
 イベントリスナーやタイマーのようなリソースを解放できるtypeを提供する
+
+## configuration
+
+https://code.visualstudio.com/api/references/contribution-points#contributes.configuration
+
+user単位、workplace単位
+
+JSONSchemaで定義
+
+各k朝機能のログはdebug console
+syntax errorはoutputに
+
+画像が取得できない
+リポジトリから取得するので先にpushしておく必要がある
+
+mermaidAPI.render
+  mermaidAPI.detectType
+  [render].draw
+
+  diagrams.sequence.sequenceRender.draw

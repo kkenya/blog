@@ -141,5 +141,62 @@ jisonをimportしている
 import { parser } from './parser/sequenceDiagram';
 ```
 
+### webpack loader
+
+loaderとは
+ファイル読み込み時に前処理を適用させることができる
+
+`src/jsion/transformer`
+
+jisonからジェネレーターをインポートして　
+
+```js
+const { Generator } = require('jison');
+
+module.exports = {
+  process(sourceText, sourcePath, options) {
+    return { code: new Generator(sourceText, options.transformerConfig).generate() };
+  },
+};
+```
+
+- [Loaders](https://webpack.js.org/concepts/loaders)
+
 ## jison
+
+jisonファイルからparserの生成
+
+jison calculator.jison
+
+calculator.jsが生成される
+
+定義された構文に沿ったファイルを指定して、っj生成されたスクリプトを呼び出し
+
+字句: 正規表現
+構文: 文脈自由文法
+
+字句解析(tokenize)
+字句(token)を抜き出して構文解析処理で
+字句解析器(lexeer, tokenizer)
+
+構文解析(parse)
+構文解析器(parser)
+
+バッカス・ナウア記法(BNF)
+再起的に構文木を生成
+
+終端記号
+非終端記号
+1+2*(3-4)
+1+2*(3-4)<cxpr>
+
+yacc(Yet Another Compiler Compiler)
+bison
+```
+<expr>   ::= <term> | <expr> + <term> | <expr> - <term>
+<term>   ::= <factor> | <term> * <factor> | <term > / <factor>
+<factor> ::= ( <expr> ) | <number>
+<number> ::= 数値
+```
+
 
