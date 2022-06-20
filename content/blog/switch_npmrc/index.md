@@ -1,5 +1,5 @@
 ---
-title: ディレクトリごとにnpmrcを切り替えたかった
+title: ディレクトリごとにnpmrcを切り替える
 date: "2022-04-24T14:26:05+09:00"
 status: published
 ---
