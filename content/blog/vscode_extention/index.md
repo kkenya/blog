@@ -1,18 +1,22 @@
 ---
-title: vscodeの拡張機能開発について
+title: vscodeの拡張機能を開発する
 date: "2022-04-04T20:58:00+09:00"
-status: draft
+status: published
 ---
 
-コードジェネレーターをインストール
+Visual Studio Code(以下vscode)の拡張機能開発はMicrosoftが提供するジェネレーターを利用して `TypeScript` で記述する
 
-```mermaid
-npm install -g yo generator-code
-yo code
+## プロジェクトの作成
+
+拡張機能は[yoeman](https://github.com/yeoman/yo)を利用する
+[GET STARTED](https://code.visualstudio.com/api/get-started/your-first-extension)に沿って雛形を生成
+
+```shell
+npm install --global yo generator-code
 ```
 
-雛形の作成
-`New Language Support` を選択し、対話的にプロジェクトを初期化
+インストールしたgeneratorを利用して対話的に初期化を行う
+vscode内で実行可能なコマンドや、エディタのカラーテーマ、言語のsyntax highlightなど雛形の種類を選択する
 
 ```shell
 % yo code
@@ -74,126 +78,107 @@ For more information, also visit http://code.visualstudio.com and follow us @cod
 ? Do you want to open the new folder with Visual Studio Code? Open with `code`
 ```
 
-## デバッグ
+## 開発
 
-`npm run watch` でソースコードの変更を監視して逐次トランスパイルを実行する
+ソースコードの変更を監視して逐次トランスパイルするため `npm run watch` を実行しておく
 
-`F5` でデバッグを実行すると、Extention Development Hostという名前で新しいvscodeのwindowが開く
-トランスパイルしたソースコードを、Extention Development Hostに反映させるのは `Cmd + R`(または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` )を実行する
+デバッグを実行( `F5` )すると、Extention Development Hostという名前で新しいvscodeのウインドウが開く
+ソースコードの変更を、Extention Development Hostに反映させるのは `Cmd + R` または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` を実行しリロードする
 
-### [Scope inspector](https://code.visualstudio.com/api/language-extensions/syntax-highlight-guide#scope-inspector)
+### ログの出力
 
-`Developer: Inspect Editor Tokens and Scopes`
+デバッグには基本的にステップ実行を利用して開発するが、`console.log` などでのプリントでバッグを行う場合DEBUG CONSOLE二出力される
 
-リファレンスで推奨しているショートカットを登録。表示・非表示をショートカットで切り替えられるようになる
+例えば、拡張機能を有効化時に呼び出される `activate` 関数にログを追加する
 
-```json
-{
-  "key": "cmd+alt+shift+i",
-  "command": "editor.action.inspectTMScopes"
+```typescript
+export function activate(context: vscode.ExtensionContext) {
+  console.log('activated!');
+  // ...
 }
 ```
 
-## 文法
+Extention Development Hostのウインドウをリロードすると、拡張機能開発側のウインドウでログを確認できる
 
-markdownなら拡張起動を機能
-対応する[indentifier](https://code.visualstudio.com/docs/languages/identifiers)
+![vscode output debug log](./output_log.png)
 
-## jsonの代わりにyamlで記述する
+## 公開
 
-yamlで簡潔に設定ファイル記述する。vscodeではjsonの文法のみを読み込むため、拡張機能を提供する際にyamlからjsonに変換する必要がある
+拡張機能を公開するには [vsce](https://github.com/microsoft/vscode-vsce)(Visual Studio Code Extention Manager)を利用する。
 
-scaffoldした時点ではjsonファイルなので[js-yaml](https://github.com/nodeca/js-yaml)を利用してyamlに変換
-
-```shell
-px js-yaml syntaxes/mermaid.tmLanguage.json > syntaxes/mermaid.tmLanguage.yaml
-```
-
-今後はyamlで記述し、拡張機能をデバッグ・publishする際にjsonに変換する
+`vsce` のインストール
 
 ```shell
-npm i -D js-yaml
+npm install -g vsce
 ```
 
-## パッケージの公開
+vscodeのマーケットプレイスへの公開は Azure DevOptsで作成したPersonal Access Tokenを作成しておく必要がある
 
-パッケージ化には `vsce` を利用する。
+詳細は[ドキュメント](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#get-a-personal-access-token)を参照
 
-colorize participant, actor
-apply sequencial number to editor
-rgb selector
+`package.json` に記述したpublisherでvsceにログインし、作成したPersonal Access Tokenを登録する
 
-tokenize　字句解析　馴染みのない単語なので説明できるように
+```shell
+% vsce login kkenya
+Publisher 'kkenya' is already known
+Do you want to overwrite its PAT? [y/N] y
+https://marketplace.visualstudio.com/manage/publishers/
+Personal Access Token for publisher 'kkenya': ****************************************************
 
-unified: ASTsでコンテンツを変換するプロジェクト
-remark: unifiedにmarkdownのサポートを追加する
-mdast: remarkが利用するmarkdown AST
-micomark: remarkが利用するmarkdown parser
+The Personal Access Token verification succeeded for the publisher 'kkenya'.
+```
 
-[remark-parse](https://github.com/remarkjs/remark/tree/main/packages/remark-parse): micromarkを利用してmarkdownをトークンに解析し、解析したトークンをmdast構文のツリーに変換するremarkはコンテンツ変換の内部を抽象化する
-markdownをHTMLに変換するだけならmicromarkの利用を推奨している
-ASTを直接いじるならmdast-util-from-markdown
+vsceでパッケージ化すると `拡張機能名-バージョン.vsix` でVSIXファイルが生成される
+公開前にVSIXファイルから拡張機能をインストールし確認することも可能
 
-[mdast-util-from-markdown](https://github.com/syntax-tree/mdast-util-from-markdown): markdownをASTに変換するmdastのユーティリティ。markdownをtokenに変換するmicromarkを利用している
+```shell
+vsce package
+```
 
-Activation Event
+vscodeのマーケットプレイスに拡張機能を公開する
 
-### contributions
+```shell
+vsce publish
+```
 
-拡張機能が影響を及ぼす範囲を記述する?
-コマンド、言語、イベント...
+## 詰まった点
 
-### onLaunguage
+### サンプル実装
 
-指定した言語のファイルが開かれる毎に `active` 関数へイベントが送信される
+ユーザー設定やシンタックスハイライトなどのミニマムな実装は[サンプル集](https://github.com/microsoft/vscode-extension-samples)を参考にするといい
 
-window と workspace
-active editors と　visible editors
+### extentionはextensionのタイポ
 
-### Event
+よく見かける
 
-onDidChangeActiveTextEditor
-active editorが変わった時
-paneを移動すると発火、テキスト自体の変更ではない
+### Personal Access Tokenの有効期限が切れていた
 
-inspectorでastをprettyに
-npm i -D unist-util-inspect
-https://github.com/syntax-tree/unist-util-inspect
+Azure DevOptsで再度作成し、 `vsce login` を実行し再登録
 
-## こまった
+```shell
+ INFO  Publishing 'kkenya.mermaid-sequence-number v1.2.0'...
+ ERROR  {"$id":"1","customProperties":{"Descriptor":null,"IdentityDisplayName":null,"Token":null,"RequestedPermissions":0,"NamespaceId":"00000000-0000-0000-0000-000000000000"},"innerException":null,"message":"Access Denied: The Personal Access Token used has expired.","typeName":"Microsoft.VisualStudio.Services.Security.AccessCheckException, Microsoft.VisualStudio.Services.WebApi","typeKey":"AccessCheckException","errorCode":0,"eventId":3000}
+
+You're using an expired Personal Access Token, please get a new PAT.
+More info: https://aka.ms/vscodepat
+```
+
+### エラーでデバッグのウインドウが起動しない
 
 F5でデバッグ時にエラー
 `Extension is not compatible with Code 1.65.2. Extension requires: ^1.66.0.`
 起動し直したら直った
-複数インスタンス起動していたからバージョンが同期できていなかった？
+複数インスタンス起動していたからバージョンが同期できていなかっ?
 
-変更が反映されない
-typescriptで開発しているので、javascriptに都度トランスパイルする必要がある
-`npm run compile` または `npm run watch` で変更を監視しましょう
+### マーケットプレイスでREADMEの画像が表示できない
 
-アイコンについて
-背景について
+マーケットプレイスの画像はリポジトリを参照するので拡張機能をpublishしたが、リポジトリを更新していなかったため、取得元の画像が存在せず表示できなかった
+
+### vsce packageでエラーになる
 
 画像をgitignoreの対象にしていて、パッケージ作成時に画像をバンドルできずエラーになった
 
-正規表現で遅くなった
+## 参考
 
-処理を実行するイベントについて
-テキストを開いた時に反映されない
-
-windowとworkspaceについて
-
-Eventの引数について
-https://code.visualstudio.com/api/references/vscode-api#EvaluatableExpressionProvider
-
-Event
-イベントを購読するリスナーを登録する
-lisner リスナーはイベントが発火した際に呼ばれる
-thisArgs イベントリスナーを呼び出した際に利用される
-disposables disposableが追加されるdisposableの配列
-返り値 disposable
-
-dispose 意味　廃棄
-
-Disposable
-イベントリスナーやタイマーのようなリソースを解放できるtypeを提供する
+- [GET STARTED](https://code.visualstudio.com/api/get-started/your-first-extension)
+- [microsoft/vscode-extension-samples](https://github.com/microsoft/vscode-extension-samples)
