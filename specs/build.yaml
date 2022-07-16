@@ -7,7 +7,7 @@ phases:
     commands:
       - n 16
       # TODO: use docker image
-      - npm install -g gatsby-cli
+      - npm install --location=global gatsby-cli
       - npm ci
       - npm run build
 artifacts:
