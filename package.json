@@ -25,9 +25,8 @@
     "url": "git+https://github.com/kkenya/blog.git"
   },
   "dependencies": {
-    "gatsby": "^3.11.0",
+    "gatsby": "^4.18.2",
     "gatsby-plugin-feed": "^3.11.0",
-    "gatsby-plugin-gatsby-cloud": "^2.11.0",
     "gatsby-plugin-google-analytics": "^3.11.0",
     "gatsby-plugin-image": "^1.11.0",
     "gatsby-plugin-manifest": "^3.11.0",
