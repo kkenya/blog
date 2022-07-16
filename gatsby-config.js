@@ -8,7 +8,7 @@ module.exports = {
     },
   },
   plugins: [
-    // gatsby-plugin-image
+    // image
     `gatsby-plugin-image`,
     {
       resolve: `gatsby-source-filesystem`,
@@ -19,6 +19,7 @@ module.exports = {
     },
     `gatsby-plugin-sharp`,
     `gatsby-transformer-sharp`, // Needed for dynamic images
+    // filesystem
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -26,6 +27,7 @@ module.exports = {
         path: `${__dirname}/src/images`,
       },
     },
+    // remark
     {
       resolve: `gatsby-transformer-remark`,
       options: {
@@ -33,6 +35,9 @@ module.exports = {
           {
             resolve: `gatsby-remark-images`,
             options: {
+              // It's important to specify the maxWidth (in pixels) of
+              // the content container as this plugin uses this as the
+              // base for generating different widths of each image.
               maxWidth: 630,
             },
           },
@@ -44,7 +49,6 @@ module.exports = {
           },
           `gatsby-remark-prismjs`,
           `gatsby-remark-copy-linked-files`,
-          `gatsby-remark-smartypants`,
         ],
       },
     },
@@ -107,21 +111,6 @@ module.exports = {
     //     ],
     //   },
     // },
-    {
-      resolve: `gatsby-plugin-manifest`,
-      options: {
-        name: `Gatsby Starter Blog`,
-        short_name: `GatsbyJS`,
-        start_url: `/`,
-        background_color: `#ffffff`,
-        theme_color: `#663399`,
-        display: `minimal-ui`,
-        icon: `src/images/favicon.jpg`, // This path is relative to the root of the site.
-      },
-    },
     `gatsby-plugin-react-helmet`,
-    // this (optional) plugin enables Progressive Web App + Offline functionality
-    // To learn more, visit: https://gatsby.dev/offline
-    // `gatsby-plugin-offline`,
   ],
 }
