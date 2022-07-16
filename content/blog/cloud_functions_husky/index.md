@@ -1,5 +1,5 @@
 ---
-title: Cloud Functionsのディレクトリ構造で `husky` のインストールにハマった
+title: Cloud Functionsのディレクトリ構造でhuskyのインストールにハマった
 date: "2022-05-01T02:38:20+09:00"
 status: published
 ---

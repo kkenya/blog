@@ -37,4 +37,3 @@ lsof -t -i:8080 -i:3000
 ```shell
 lsof -t -i:8080 | xargs kill
 ```
-
