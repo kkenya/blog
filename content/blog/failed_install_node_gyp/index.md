@@ -16,7 +16,7 @@ macOS Catalinaで `node-gyp` インストール時に `gyp: No Xcode or CLT vers
 
 xcodeの再インストールを行う。対応を `node-gyp` の[リポジトリでまとめてくれている](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#the-acid-test)ので書いてある通りに対応すれば問題なかった。
 
-```sh
+```shell
 sudo rm -rf $(xcode-select -print-path)
 sudo xcode-select --reset
 xcode-select --install
@@ -24,7 +24,7 @@ xcode-select --install
 
 [スクリプトを実行](https://github.com/nodejs/node-gyp/blob/master/macOS_Catalina.md#the-acid-test)して確認。
 
-```sh
+```shell
 curl -sL https://github.com/nodejs/node-gyp/raw/master/macOS_Catalina_acid_test.sh | bash
 ```
 
@@ -40,7 +40,7 @@ xcodeの再インストールをしてもエラーになる場合は[I did all t
 
 xcodeのインストールを実行したが、インストール済みと表示された。
 
-```sh
+```shell
 % xcode-select --install
 
 xcode-select: error: command line tools are already installed, use "Software Update" to install updates
@@ -48,13 +48,13 @@ xcode-select: error: command line tools are already installed, use "Software Upd
 
 rootユーザーでxcodeをリセットしてインストールし直したが、変わらず。
 
-```sh
+```shell
 % xcode-select --reset
 xcode-select: error: --reset must be run as root (e.g. `sudo xcode-select --reset`).
 % sudo xcode-select --reset
 ```
 
-```sh
+```shell
 % xcodebuild --version
 xcode-select: error: tool 'xcodebuild' requires Xcode, but active developer directory '/Library/Developer/CommandLineTools' is a command line tools instance
 ```
@@ -65,7 +65,7 @@ AppStoreでxcodeのインストールしようとするが、カタリナでは�
 
 node-gypのグローバルインストールは成功するが、xcode自体が見つからない問題は解決できない。
 
-```sh
+```shell
 % npm install -g node-gyp
 ~/.nvm/versions/node/v14.17.6/bin/node-gyp -> ~/.nvm/versions/node/v14.17.6/lib/node_modules/node-gyp/bin/node-gyp.js
 + node-gyp@8.2.0

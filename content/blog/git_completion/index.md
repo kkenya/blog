@@ -9,14 +9,14 @@ status: published
 Macにプリインストールされているgitからhomebrewでインストールしたgitに移行する。
 gitのインストール先を確認。
 
-```sh
+```shell
 $ which git
 /usr/bin/git
 ```
 
 brewでインストールすると、同時にgit補完のためのスクリプトもインストールされる。
 
-```sh
+```shell
 $ brew install git
 ==> Upgrading 1 outdated package, with result:
 git 2.18.0 -> 2.19.0_1
@@ -36,7 +36,7 @@ Emacs Lisp files have been installed to:
 
 gitのバージョンを確認し、インストールしたバージョンが反映されていれば成功。
 
-```sh
+```shell
 $ git --version
 git version 2.19.0
 $ which git
@@ -47,7 +47,7 @@ $ which git
 
 先ほどインストールされた補完スクリプトのディレクトリを確認。
 
-```sh
+```shell
 $ ls /usr/local/etc/bash_completion.d
 brew			git-completion.bash	git-prompt.sh		nodebrew		npm
 ```
@@ -62,6 +62,6 @@ source /usr/local/etc/bash_completion.d/git-prompt.sh
 
 シェルの設定ファイルを再度読み込む。
 
-```sh
+```shell
 source ~/.bash_profile
 ```

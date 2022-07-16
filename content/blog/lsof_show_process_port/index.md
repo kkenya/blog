@@ -17,7 +17,7 @@ supervisorを利用している際、終了に失敗したプロセスがポー�
 
 `-i:ポート番号` でポートを指定してプロセスを一覧。
 
-```sh
+```shell
 % lsof -i:8080
 COMMAND   PID   USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
 nginx   88310 user    6u  IPv4 0x454bfe04c236e37d      0t0  TCP *:http-alt (LISTEN)
@@ -26,7 +26,7 @@ nginx   88315 user    6u  IPv4 0x454bfe04c236e37d      0t0  TCP *:http-alt (LIST
 
 ### 複数指定
 
-```sh
+```shell
 lsof -t -i:8080 -i:3000
 ```
 
@@ -34,7 +34,7 @@ lsof -t -i:8080 -i:3000
 
 `-t` でheaderなしかつプロセスIDのみを表示する。killにパイプして指定のポート番号を利用しているプロセスを終了する際によく利用する。
 
-```sh
+```shell
 lsof -t -i:8080 | xargs kill
 ```
 
