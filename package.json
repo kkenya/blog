@@ -1,7 +1,7 @@
 {
   "name": "blog",
   "private": true,
-  "description": "A starter for a blog powered by Gatsby and Markdown",
+  "description": "kkenya's blog",
   "version": "0.1.0",
   "author": "kkenya <3982ne@gmail.com>",
   "scripts": {
@@ -11,7 +11,7 @@
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 0",
+    "test": "echo 'no test'",
     "lint": "textlint content",
     "lint:fix": "textlint --fix content"
   },
@@ -32,7 +32,6 @@
     "gatsby-plugin-manifest": "^4.18.1",
     "gatsby-plugin-offline": "^5.18.1",
     "gatsby-plugin-react-helmet": "^5.18.0",
-    "gatsby-plugin-sharp": "^4.18.1",
     "gatsby-remark-copy-linked-files": "^5.18.0",
     "gatsby-remark-images": "^6.18.1",
     "gatsby-remark-prismjs": "^6.18.0",
