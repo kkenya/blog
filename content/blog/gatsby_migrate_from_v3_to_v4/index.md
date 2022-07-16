@@ -4,12 +4,12 @@ date: "2022-07-16T22:13:03+09:00"
 status: published
 ---
 
-[ドキュメント](https://www.gatsbyjs.com/docs/reference/release-notes/migrating-from-v3-to-v4/)のマイグレーション手順に従いGatsbyを3系から4系に更新した
+ブログのSSGに利用しているGatsbyを[マイグレーション手順](https://www.gatsbyjs.com/plugins/gatsby-plugin-offline/)に従いGatsbyを3系から4系に更新した
 パッケージの依存関係が崩れる可能性があるので適宜ビルドできるか確認しながら進めたが、破壊的な変更はほとんどなくパッケージの更新で対応できた
 
 ## Nodejs更新
 
-Nodejs16, npm8を利用する
+Nodejs16、npm8に更新した
 CI/CDのランタイムも合わせて更新
 
 ## Gatsby更新
