@@ -12,7 +12,7 @@ status: draft
 
 ### ルールの追加
 
-```sh
+```shell
 npm i -D textlint-rule-preset-ja-technical-writing textlint-rule-preset-jtf-style textlint-rule-spellcheck-tech-word
 ```
 

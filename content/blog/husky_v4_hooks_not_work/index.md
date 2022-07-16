@@ -18,14 +18,14 @@ status: published
 
 gitの変数 `core.hooksPath` を削除する。
 
-```sh
+```shell
 # これで core.hooksPathも削除される
 npx husky uninstall
 ```
 
 または、gitの設定を変更する。
 
-```sh
+```shell
 git config --unset core.hooksPath
 ```
 
@@ -36,7 +36,7 @@ git config --unset core.hooksPath
 
 `.git/hooks` 配下には今回リポジトリで設定していた `pre-commit` が存在しているので確認すると `.git/husky.sh` を実行していた。
 
-```sh
+```shell
 % bat .git/hooks/pre-commit
 ───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: .git/hooks/pre-commit
@@ -54,7 +54,7 @@ git config --unset core.hooksPath
 
 .huskyも存在している。
 
-```sh
+```shell
 % ls .git/hooks
 applypatch-msg  husky.local.sh  post-applypatch  post-commit  post-rewrite  pre-applypatch  pre-commit        pre-push    prepare-commit-msg  sendemail-validate
 commit-msg      husky.sh        post-checkout    post-merge   post-update   pre-auto-gc     pre-merge-commit  pre-rebase  push-to-checkout
@@ -67,7 +67,7 @@ githooksのドキュメントを確認すると `core.hooksPath` を設定する
 
 `.git/config` を確認すると `hooksPath` に `.husky` が設定されていた。
 
-```sh
+```shell
 % bat .git/config
 ───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: .git/config
@@ -85,7 +85,7 @@ githooksのドキュメントを確認すると `core.hooksPath` を設定する
 
 `core.hooksPath` の設定をなくし（直接ファイルから削除してもいい）、commitすると以前と同じようにhooksが実行された。
 
-```sh
+```shell
 % git config --unset core.hooksPath
 % git commit
 husky > pre-commit (node v14.17.6)
@@ -95,7 +95,7 @@ husky > pre-commit (node v14.17.6)
 
 ### 同じ状況を再現するには
 
-```sh
+```shell
 npx husky install
 ```
 
