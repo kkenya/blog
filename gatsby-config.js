@@ -1,3 +1,7 @@
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+
 module.exports = {
   siteMetadata: {
     title: `蛙のテックブログ`,
@@ -8,6 +12,7 @@ module.exports = {
     },
   },
   plugins: [
+    // image
     `gatsby-plugin-image`,
     {
       resolve: `gatsby-source-filesystem`,
@@ -16,6 +21,9 @@ module.exports = {
         name: `blog`,
       },
     },
+    `gatsby-plugin-sharp`,
+    `gatsby-transformer-sharp`, // Needed for dynamic images
+    // filesystem
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -23,6 +31,7 @@ module.exports = {
         path: `${__dirname}/src/images`,
       },
     },
+    // markdown
     {
       resolve: `gatsby-transformer-remark`,
       options: {
@@ -30,6 +39,9 @@ module.exports = {
           {
             resolve: `gatsby-remark-images`,
             options: {
+              // It's important to specify the maxWidth (in pixels) of
+              // the content container as this plugin uses this as the
+              // base for generating different widths of each image.
               maxWidth: 630,
             },
           },
@@ -41,18 +53,21 @@ module.exports = {
           },
           `gatsby-remark-prismjs`,
           `gatsby-remark-copy-linked-files`,
-          `gatsby-remark-smartypants`,
         ],
       },
     },
-    `gatsby-transformer-sharp`,
-    `gatsby-plugin-sharp`,
-    // {
-    //   resolve: `gatsby-plugin-google-analytics`,
-    //   options: {
-    //     trackingId: `ADD YOUR TRACKING ID HERE`,
-    //   },
-    // },
+    // tracking
+    {
+      resolve: `gatsby-plugin-google-gtag`,
+      options: {
+        trackingIds: [
+          process.env.GOOGLE_ANALYTICS_TRACKING_ID, // Google Analytics / GA
+        ],
+        pluginConfig: {
+          head: true,
+        },
+      },
+    },
     // {
     //   resolve: `gatsby-plugin-feed`,
     //   options: {
@@ -106,21 +121,6 @@ module.exports = {
     //     ],
     //   },
     // },
-    {
-      resolve: `gatsby-plugin-manifest`,
-      options: {
-        name: `Gatsby Starter Blog`,
-        short_name: `GatsbyJS`,
-        start_url: `/`,
-        background_color: `#ffffff`,
-        theme_color: `#663399`,
-        display: `minimal-ui`,
-        icon: `src/images/favicon.jpg`, // This path is relative to the root of the site.
-      },
-    },
     `gatsby-plugin-react-helmet`,
-    // this (optional) plugin enables Progressive Web App + Offline functionality
-    // To learn more, visit: https://gatsby.dev/offline
-    // `gatsby-plugin-offline`,
   ],
 }
