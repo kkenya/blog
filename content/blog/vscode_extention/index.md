@@ -1,7 +1,7 @@
 ---
 title: vscodeの拡張機能を開発する
 date: "2022-04-04T20:58:00+09:00"
-status: published
+status: dfaft
 ---
 
 Visual Studio Code(以下vscode)の拡張機能開発はMicrosoftが提供するジェネレーターを利用して `TypeScript` で記述する
@@ -80,7 +80,11 @@ For more information, also visit http://code.visualstudio.com and follow us @cod
 
 ## 開発
 
-ソースコードの変更を監視して逐次トランスパイルするため `npm run watch` を実行しておく
+`npm run watch` でソースコードの変更を監視して逐次トランスパイルを実行する
+
+`F5` でデバッグを実行すると、Extention Development Hostという名前で新しいvscodeのwindowが開く
+トランスパイルしたソースコードを、Extention Development Hostに反映させるのは `Cmd + R`(または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` )を実行する
+>>>>>>> adedc3c (wip)
 
 デバッグを実行( `F5` )すると、Extention Development Hostという名前で新しいvscodeのウインドウが開く
 ソースコードの変更を、Extention Development Hostに反映させるのは `Cmd + R` または　`Cmd  + Shift + P` でコマンドパレットを開いて `Developer: Reload Window` を実行しリロードする
@@ -165,6 +169,24 @@ More info: https://aka.ms/vscodepat
 
 ### エラーでデバッグのウインドウが起動しない
 
+css単位
+em
+文字の高さを基準とした相対的な単位
+
+[DecorationOptions](https://code.visualstudio.com/api/references/vscode-api#DecorationOptions)
+renderOptions: [DecorationInstanceRenderOptions](https://code.visualstudio.com/api/references/vscode-api#DecorationInstanceRenderOptions)
+パフォーマンスの理由からdecoration固有のオプションは最小にし、可能な限りdecoration typeを利用す る
+after, beforeで指定した範囲の前、後どちらかの表示できる
+dark, lightでテーマ切り替えできる
+
+[TextEditorDecorationType](https://code.visualstudio.com/api/references/vscode-api#TextEditorDecorationType)
+text editorで共通した装飾を提供する
+
+[ThemableDecorationAttachmentRenderOptions](https://code.visualstudio.com/api/references/vscode-api#ThemableDecorationAttachmentRenderOptions)
+装飾の描画オプション
+
+## こまった
+
 F5でデバッグ時にエラー
 `Extension is not compatible with Code 1.65.2. Extension requires: ^1.66.0.`
 起動し直したら直った
@@ -178,7 +200,203 @@ F5でデバッグ時にエラー
 
 画像をgitignoreの対象にしていて、パッケージ作成時に画像をバンドルできずエラーになった
 
+### 困った
+
+変更が反映されない
+typescriptで開発しているので、javascriptに都度トランスパイルする必要がある
+`npm run compile` または `npm run watch` で変更を監視しましょう
+
+アイコンについて
+背景について
+
+画像をgitignoreの対象にしていて、パッケージ作成時に画像をバンドルできずエラーになった
+
+正規表現で遅くなった
+
+処理を実行するイベントについて
+テキストを開いた時に反映されない
+
+windowとworkspaceについて
+
+Eventの引数について
+https://code.visualstudio.com/api/references/vscode-api#EvaluatableExpressionProvider
+
+Event
+イベントを購読するリスナーを登録する
+lisner リスナーはイベントが発火した際に呼ばれる
+thisArgs イベントリスナーを呼び出した際に利用される
+disposables disposableが追加されるdisposableの配列
+返り値 disposable
+
+dispose 意味　廃棄
+
+Disposable
+イベントリスナーやタイマーのようなリソースを解放できるtypeを提供する
+
 ## 参考
 
 - [GET STARTED](https://code.visualstudio.com/api/get-started/your-first-extension)
 - [microsoft/vscode-extension-samples](https://github.com/microsoft/vscode-extension-samples)
+## publish
+
+対話的にパッケージを生成
+設定していない項目があれば、わかる
+
+```shell
+npm install -g vsce
+vsce package
+```
+  
+```shell
+s06540@CA-20007798[~/work/github.com/kkenya/mermaid-sequential-number] (main) % vsce package
+Executing prepublish script 'npm run vscode:prepublish'...
+
+> mermaid-sequential-number@0.0.1 vscode:prepublish /Users/s06540/work/github.com/kkenya/mermaid-sequential-number
+> npm run package
+
+
+> mermaid-sequential-number@0.0.1 package /Users/s06540/work/github.com/kkenya/mermaid-sequential-number
+> webpack --mode production --devtool hidden-source-map
+
+    [webpack-cli] Compiler starting...
+    [webpack-cli] Compiler is using config: '/Users/s06540/work/github.com/kkenya/mermaid-sequential-number/webpack.config.js'
+    [webpack-cli] Compiler finished
+asset extension.js 83.2 KiB [compared for emit] [minimized] (name: main) 1 related asset
+orphan modules 230 KiB [orphan] 53 modules
+runtime modules 670 bytes 3 modules
+built modules 234 KiB [built]
+  ./src/extension.ts 4.21 KiB [built] [code generated]
+  ./node_modules/mdast-util-from-markdown/index.js + 52 modules 230 KiB [built] [code generated]
+  external "vscode" 42 bytes [built] [code generated]
+webpack 5.71.0 compiled successfully in 3093 ms
+ WARNING  A 'repository' field is missing from the 'package.json' manifest file.
+Do you want to continue? [y/N] y
+ DONE  Packaged: /Users/s06540/work/github.com/kkenya/mermaid-sequential-number/mermaid-sequential-number-0.0.1.vsix (7 files, 30.67KB)
+```
+
+https://code.visualstudio.com/api/working-with-extensions/publishing-extension
+## 参考
+
+- https://engineering.linecorp.com/ja/blog/uit-enhancement-vscode/
+- https://vscode.rocks/decorations/
+
+- https://vscode.rocks/decorations/
+
+package.jsonの設定
+https://code.visualstudio.com/api/references/extension-manifest
+
+changelogについて
+
+日本語版
+https://keepachangelog.com/ja/1.0.0/
+
+## 帰り値
+
+Not all code paths return a value.ts(7030)
+
+{} | voidならOK
+{} | undefinedは失敗
+
+## 正規表現
+
+trimLeft
+trimRightのせいの脳が悪い
+正規表現の方が早かっただと
+
+/^\s* は重くて、 \s*$ は早い?
+どっちも重いわ
+
+## publish
+
+マイクロソフトアカウントでログイン
+
+https://docs.microsoft.com/azure/devops/organizations/accounts/create-organization
+
+Azure DevOpsでorganizationの作成
+projectの作成を案内されるが不要
+personal access tokenの作成に進む
+documentに従って設定
+Name: vscode入力
+Organization: All accessible organizationsに変更
+Expiration: 30daysのまま
+Scopes: 
+  Custom definedを選択
+  デフォルトでは表示されないので　Show all scopesを選択
+  MarketplaceでManage選択
+wuuabi2dg6cnffkalipaje4zexgafa42u6rmjvkkq2vh7brxeira
+
+personal access tokenは再度確認することができないのでパスワードマネージャーなどに保存しておく
+
+自分はサインインしたままになっていた
+Personal Access Tokenを作成したアカウントでVS CodeのMarketplace [managment page](https://marketplace.visualstudio.com/manage/publishers/kkenya)にログイン
+
+cliからpersonal access tokenを設定する
+vsce login kkenya
+または
+vsce publish
+を実行し、webpackでのコンパイル後pe、rsonal access tokenを設定できる
+
+```shell
+s06540@CA-20007798[~/work/github.com/kkenya/mermaid-editor-sequence-number] (main) % vsce publish
+Executing prepublish script 'npm run vscode:prepublish'...
+
+> mermaid-sequence-number@0.0.1 vscode:prepublish
+> npm run package
+
+
+> mermaid-sequence-number@0.0.1 package
+> webpack --mode production --devtool hidden-source-map
+
+    [webpack-cli] Compiler starting...
+    [webpack-cli] Compiler is using config: '/Users/s06540/work/github.com/kkenya/mermaid-editor-sequence-number/webpack.config.js'
+    [webpack-cli] Compiler finished
+asset extension.js 83.8 KiB [compared for emit] [minimized] (name: main) 1 related asset
+orphan modules 230 KiB [orphan] 53 modules
+runtime modules 670 bytes 3 modules
+built modules 235 KiB [built]
+  ./src/extension.ts 5.39 KiB [built] [code generated]
+  ./node_modules/mdast-util-from-markdown/index.js + 52 modules 230 KiB [built] [code generated]
+  external "vscode" 42 bytes [built] [code generated]
+webpack 5.71.0 compiled successfully in 2731 ms
+https://marketplace.visualstudio.com/manage/publishers/
+Personal Access Token for publisher 'kkenya': %
+s06540@CA-20007798[~/work/github.com/kkenya/mermaid-editor-sequence-number] (main) % vsce publish
+Executing prepublish script 'npm run vscode:prepublish'...
+
+> mermaid-sequence-number@0.0.1 vscode:prepublish
+> npm run package
+
+
+> mermaid-sequence-number@0.0.1 package
+> webpack --mode production --devtool hidden-source-map
+
+    [webpack-cli] Compiler starting...
+    [webpack-cli] Compiler is using config: '/Users/s06540/work/github.com/kkenya/mermaid-editor-sequence-number/webpack.config.js'
+    [webpack-cli] Compiler finished
+asset extension.js 83.8 KiB [compared for emit] [minimized] (name: main) 1 related asset
+orphan modules 230 KiB [orphan] 53 modules
+runtime modules 670 bytes 3 modules
+built modules 235 KiB [built]
+  ./src/extension.ts 5.39 KiB [built] [code generated]
+  ./node_modules/mdast-util-from-markdown/index.js + 52 modules 230 KiB [built] [code generated]
+  external "vscode" 42 bytes [built] [code generated]
+webpack 5.71.0 compiled successfully in 2999 ms
+https://marketplace.visualstudio.com/manage/publishers/
+Personal Access Token for publisher 'kkenya': ****************************************************
+
+The Personal Access Token verification succeeded for the publisher 'kkenya'.
+ INFO  Publishing 'kkenya.mermaid-sequence-number v0.0.1'...
+ INFO  Extension URL (might take a few minutes): https://marketplace.visualstudio.com/items?itemName=kkenya.mermaid-sequence-number
+ INFO  Hub URL: https://marketplace.visualstudio.com/manage/publishers/kkenya/extensions/mermaid-sequence-number/hub
+ DONE  Published kkenya.mermaid-sequence-number v0.0.1.
+```
+
+https://code.visualstudio.com/api/working-with-extensions/bundling-extension
+
+iconが設定できなかった
+vscodeignoreにreadmeようでimageディレクトリを指定していたので、images/icon.pngを含められなかった
+https://stackoverflow.com/questions/44423212/error-detecting-icon-when-publishing-vscode-extension
+
+```
+ ERROR  The specified icon 'extension/./images/icon.png' wasn't found in the extension.
+```
