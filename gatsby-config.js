@@ -1,3 +1,7 @@
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+
 module.exports = {
   siteMetadata: {
     title: `蛙のテックブログ`,
@@ -27,7 +31,7 @@ module.exports = {
         path: `${__dirname}/src/images`,
       },
     },
-    // remark
+    // markdown
     {
       resolve: `gatsby-transformer-remark`,
       options: {
@@ -52,12 +56,18 @@ module.exports = {
         ],
       },
     },
-    // {
-    //   resolve: `gatsby-plugin-google-analytics`,
-    //   options: {
-    //     trackingId: `ADD YOUR TRACKING ID HERE`,
-    //   },
-    // },
+    // tracking
+    {
+      resolve: `gatsby-plugin-google-gtag`,
+      options: {
+        trackingIds: [
+          process.env.GOOGLE_ANALYTICS_TRACKING_ID, // Google Analytics / GA
+        ],
+        pluginConfig: {
+          head: true,
+        },
+      },
+    },
     // {
     //   resolve: `gatsby-plugin-feed`,
     //   options: {
