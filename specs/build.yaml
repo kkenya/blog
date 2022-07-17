@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  parameter-store:
+    GOOGLE_ANALYTICS_TRACKING_ID: /production/blog/GOOGLE_ANALYTICS_TRACKING_ID
+
 phases:
   install:
     runtime-versions:
