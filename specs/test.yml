@@ -6,13 +6,13 @@ phases:
       nodejs: 12
     commands:
       - n 16
-      - npm ci
+      - npm ci --ignore-scripts --progress=false
   pre_build:
     commands:
       - npm test
   build:
     commands:
-      - echo Build started on `date`
+      - echo Build started on $(date)
   post_build:
     commands:
-      - echo Build completed on `date`
+      - echo Build completed on $(date)

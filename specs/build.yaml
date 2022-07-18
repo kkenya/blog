@@ -10,9 +10,7 @@ phases:
       nodejs: 12
     commands:
       - n 16
-      # TODO: use docker image
-      - npm install --location=global gatsby-cli
-      - npm ci
+      - npm ci --ignore-scripts --progress=false
       - npm run build
 artifacts:
   files:
