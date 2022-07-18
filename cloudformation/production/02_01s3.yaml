@@ -6,8 +6,8 @@ Description: |
 Parameters:
   ServiceName:
     Type: String
-    Description: upercase service name. export or import resource like ${ServiceName}AssetsS3BucketName
-    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+    Description: upercase service name. resources are exported or imported like {{ServiceName}}AssetsS3BucketName
+    AllowedPattern: '^[A-Z][a-zA-Z]+$'
   PublicBucketName:
     Type: String
     Description: public bucket name. it is recommended to use domain name.
@@ -51,9 +51,10 @@ Resources:
     UpdateReplacePolicy: Retain
     Properties:
       AccessControl: LogDeliveryWrite
-      BucketName: !Sub
-        - '${AssetsS3BacketName}-accesslogs'
-        - AssetsS3BacketName: !Ref PublicBucketName
+      BucketName:
+        Fn::Sub:
+          - '${AssetsS3BacketName}-accesslogs'
+          - AssetsS3BacketName: !Ref PublicBucketName
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:

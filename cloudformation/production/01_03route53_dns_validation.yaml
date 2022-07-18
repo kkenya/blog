@@ -7,7 +7,7 @@ Description: |
 Parameters:
   RootServiceName:
     Type: String
-    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
+    Description: upercase root service name. resources are exported or imported like {{RootServiceName}}PublicHostedZoneId
     AllowedPattern: "^[A-Z][a-zA-Z]+$"
   CertificateValidationRecordSetName:
     Type: String
@@ -42,4 +42,4 @@ Resources:
       ResourceRecords:
         - !Ref CertificateValidationRecordSetValue
       Type: CNAME
-      TTL: 300
+      TTL: '300'

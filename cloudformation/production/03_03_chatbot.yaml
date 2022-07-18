@@ -8,7 +8,7 @@ Description: |
 Parameters:
   ServiceName:
     Type: String
-    Description: upercase service name. export or import resource like ${ServiceName}SourceConnectionARN
+    Description: upercase service name. resources are exported or imported like {{ServiceName}}SourceConnectionARN
     AllowedPattern: '^[A-Z][a-zA-Z]+$'
   NotificationSlackChannelId:
     Type: String
@@ -34,9 +34,10 @@ Resources:
   ConfigrationOfNotification:
     Type: AWS::Chatbot::SlackChannelConfiguration
     Properties:
-      ConfigurationName: !Sub
-        - ConfigrationOf${ServiceName}DeployNotification
-        - ServiceName: !Ref ServiceName
+      ConfigurationName:
+        Fn::Sub:
+          - ConfigrationOf${ServiceName}DeployNotification
+          - ServiceName: !Ref ServiceName
       IamRoleArn: !GetAtt NotificationRole.Arn
       LoggingLevel: INFO
       SlackChannelId: !Ref NotificationSlackChannelId

@@ -8,8 +8,12 @@ Description: |
 Parameters:
   ServiceName:
     Type: String
-    Description: upercase service name. export or import resource like ${ServiceName}SourceConnectionARN
+    Description: upercase service name. resources are exported or imported like {{ServiceName}}SourceConnectionARN
     AllowedPattern: '^[A-Z][a-zA-Z]+$'
+  LowerServiceName:
+    Type: String
+    Description: lowercase service name.
+    AllowedPattern: '^[a-zA-Z]+$'
   GitHubFullRepositoryId:
     Type: String
     Description: GitHub full repository id. specify account and repository name like user/repo
@@ -26,20 +30,12 @@ Metadata:
           default: Service Configuration
         Parameters:
           - ServiceName
+          - LowerServiceName
       - Label:
           default: GitHub Configuration
         Parameters:
           - GitHubFullRepositoryId
           - BranchName
-
-# Mappings:
-#   SiteMap:
-#     Blog:
-#       Name: blog
-#   GitHubMapping:
-#     Repository:
-#       FullRepositoryId: kkenya/blog
-#       BranchName: main
 
 Resources:
   DeployPipeline:
@@ -145,6 +141,14 @@ Resources:
                       - ServiceName: !Ref ServiceName
                 Action:
                   - codestar-connections:UseConnection
+              - Sid: SsmGetParameters
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/production/${LowerServiceName}/*
+                    - LowerServiceName: !Ref LowerServiceName
+                Action:
+                  - ssm:GetParameters
               - Sid: S3ArtifactAnyPolicy
                 Effect: Allow
                 Resource:
@@ -269,12 +273,14 @@ Resources:
         - codepipeline-pipeline-pipeline-execution-resumed
         - codepipeline-pipeline-pipeline-execution-succeeded
         - codepipeline-pipeline-pipeline-execution-superseded
-      Name: !Sub
-        - '${ServiceName}TestNotificationRule'
-        - ServiceName: !Ref ServiceName
-      Resource: !Sub
-        - arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}
-        - PipelineName: !Ref DeployPipeline
+      Name:
+        Fn::Sub:
+          - '${ServiceName}TestNotificationRule'
+          - ServiceName: !Ref ServiceName
+      Resource:
+        Fn::Sub:
+          - arn:${AWS::Partition}:codepipeline:${AWS::Region}:${AWS::AccountId}:${PipelineName}
+          - PipelineName: !Ref DeployPipeline
       Status: ENABLED
       Targets:
         - TargetAddress: !Ref NotificationTopic
@@ -283,17 +289,20 @@ Resources:
   NotificationTopic:
     Type: AWS::SNS::Topic
     Properties:
-      DisplayName: !Sub
-        - ${ServiceName}DeployNotification
-        - ServiceName: !Ref ServiceName
+      DisplayName:
+        Fn::Sub:
+          - ${ServiceName}DeployNotification
+          - ServiceName: !Ref ServiceName
       Tags:
         - Key: Name
-          Value: !Sub
-            - ${ServiceName}DeployNotification
-            - ServiceName: !Ref ServiceName
-      TopicName: !Sub
-        - ${ServiceName}DeployNotification
-        - ServiceName: !Ref ServiceName
+          Value:
+            Fn::Sub:
+              - ${ServiceName}DeployNotification
+              - ServiceName: !Ref ServiceName
+      TopicName:
+        Fn::Sub:
+          - ${ServiceName}DeployNotification
+          - ServiceName: !Ref ServiceName
 
   NotificationTopicPolicy:
     Type: AWS::SNS::TopicPolicy

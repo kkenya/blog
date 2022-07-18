@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   parameter-store:
-    GOOGLE_ANALYTICS_TRACKING_ID: /production/blog/GOOGLE_ANALYTICS_TRACKING_ID
+    GOOGLE_ANALYTICS_TRACKING_ID: /production/techblog/GOOGLE_ANALYTICS_TRACKING_ID
 
 phases:
   install:

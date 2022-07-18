@@ -6,7 +6,7 @@ Description: |
 Parameters:
   RootServiceName:
     Type: String
-    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
+    Description: upercase root service name. resources are exported or imported like {{RootServiceName}}PublicHostedZoneId
     AllowedPattern: "^[A-Z][a-zA-Z]+$"
   DomainName:
     Type: String

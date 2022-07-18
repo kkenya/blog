@@ -8,18 +8,18 @@ Description: |
 Parameters:
   RootServiceName:
     Type: String
-    Description: upercase root service name. export or import resource like ${RootServiceName}PublicHostedZoneId
-    AllowedPattern: "^[A-Z][a-zA-Z]+$"
+    Description: upercase root service name. resources are exported or imported like {{ServiceName}}PublicHostedZoneId
+    AllowedPattern: '^[A-Z][a-zA-Z]+$'
   ServiceName:
     Type: String
-    Description: upercase service name. export or import resource like ${ServiceName}AssetsS3BucketName
+    Description: upercase service name. resources are exported or imported like {{ServiceName}}AssetsS3BucketName
     AllowedPattern: '^[A-Z][a-zA-Z]+$'
   AcmCertificateArn:
     Type: String
     Description: ACM certificate ARN(Amazon Resource Name)
   LastDomainName:
     Type: String
-    Description: last string for subdomain. substituted like ${LastDomainName}.example.com
+    Description: last string for subdomain. substituted like {{LastDomainName}}.example.com
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -50,9 +50,10 @@ Resources:
                 - ${ServiceName}AssetsS3BucketDomainName
                 - ServiceName: !Ref ServiceName
             S3OriginConfig:
-              OriginAccessIdentity: !Sub
-                - origin-access-identity/cloudfront/${OriginAccessIdentityId}
-                - OriginAccessIdentityId: !Ref CloudFrontOriginAccessIdentity
+              OriginAccessIdentity:
+                Fn::Sub:
+                  - origin-access-identity/cloudfront/${OriginAccessIdentityId}
+                  - OriginAccessIdentityId: !Ref CloudFrontOriginAccessIdentity
         Enabled: true
         DefaultRootObject: index.html
         Logging:
@@ -78,13 +79,13 @@ Resources:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
         Aliases:
-          - !Sub
-            - '${LastDomainName}.${HostedZoneName}'
-            - LastDomainName: !Ref LastDomainName
-              HostedZoneName:
-                Fn::ImportValue: !Sub
-                  - ${RootServiceName}PublicHostedZoneName
-                  - RootServiceName: !Ref RootServiceName
+          - Fn::Sub:
+              - '${LastDomainName}.${HostedZoneName}'
+              - LastDomainName: !Ref LastDomainName
+                HostedZoneName:
+                  Fn::ImportValue: !Sub
+                    - ${RootServiceName}PublicHostedZoneName
+                    - RootServiceName: !Ref RootServiceName
         ViewerCertificate:
           MinimumProtocolVersion: TLSv1.2_2021 # recommended
           SslSupportMethod: sni-only #  server name indication (SNI)
@@ -131,11 +132,12 @@ Resources:
         Fn::ImportValue: !Sub
           - ${RootServiceName}PublicHostedZoneId
           - RootServiceName: !Ref RootServiceName
-      Name: !Sub
-        - '${LastDomainName}.${HostedZoneName}'
-        - LastDomainName: !Ref LastDomainName
-          HostedZoneName:
-            Fn::ImportValue: !Sub
-              - ${RootServiceName}PublicHostedZoneName
-              - RootServiceName: !Ref RootServiceName
+      Name:
+        Fn::Sub:
+          - '${LastDomainName}.${HostedZoneName}'
+          - LastDomainName: !Ref LastDomainName
+            HostedZoneName:
+              Fn::ImportValue: !Sub
+                - ${RootServiceName}PublicHostedZoneName
+                - RootServiceName: !Ref RootServiceName
       Type: A
