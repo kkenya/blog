@@ -141,14 +141,6 @@ Resources:
                       - ServiceName: !Ref ServiceName
                 Action:
                   - codestar-connections:UseConnection
-              - Sid: SsmGetParameters
-                Effect: Allow
-                Resource:
-                  - !Sub
-                    - arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/production/${LowerServiceName}/*
-                    - LowerServiceName: !Ref LowerServiceName
-                Action:
-                  - ssm:GetParameters
               - Sid: S3ArtifactAnyPolicy
                 Effect: Allow
                 Resource:
@@ -236,6 +228,14 @@ Resources:
           PolicyDocument:
             Version: 2012-10-17
             Statement:
+              - Sid: SsmGetServiceParameters
+                Effect: Allow
+                Resource:
+                  - !Sub
+                    - arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/production/${LowerServiceName}/*
+                    - LowerServiceName: !Ref LowerServiceName
+                Action:
+                  - ssm:GetParameter*
               - Sid: CloudWatchLogsPolicy
                 Effect: Allow
                 Resource:
