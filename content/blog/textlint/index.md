@@ -41,6 +41,7 @@ fixを実行
 失敗してもpushしたい
 
 ## GitHub Actionsで強制する
+
 ## 参考
 
 - [技術文章の文章校正をtextlintとGitHub Actionsで快適にする](https://ponzmild.hatenablog.com/entry/2020/08/23/135152)

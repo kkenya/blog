@@ -1,7 +1,7 @@
 ---
 title: cfn-lintでCloudFormationの静的解析を行う
 date: "2021-01-13T03:43:45+09:00"
-status: draft
+status: published
 ---
 
 [cfn-lint](https://github.com/aws-cloudformation/cfn-lint)をインストールする
