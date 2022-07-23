@@ -42,7 +42,7 @@ visudo
 
 コメントアウトを外し、wheelグループが全てのコマンドを実行可能する。
 
-```/etc/sudoers
+```txt
 %wheel  ALL=(ALL)  ALL
 ```
 <!--
@@ -80,7 +80,7 @@ os全体の認証システムである「PAM(Pluggable Authentication Modules)�
 
 `su`コマンドのPAM設定ファイルである`/etc/pam.d/su`ファイル内のコメントアウトを外し、pam_wheel.so モジュールを有効化する。
 
-```/etc/pam.d/su
+```text
 # Uncomment the following line to require a user to be in the "wheel" group.
 auth           required        pam_wheel.so use_uid
 ```
@@ -95,14 +95,14 @@ vim /etc/ssh/sshd_config
 
 パスワード認証を許可し、セキュリティを高めるためにrootユーザーでのSSHログインを禁止する。
 
-```/etc/ssh/sshd_config
+```text
 PermitRootLogin no
 PasswordAuthentication yes
 ```
 
 接続するユーザーを制限する場合
 
-```/etc/ssh/sshd_config
+```text
 AllowUsers test # 複数指定する場合 AllowUsers ユーザー1 ユーザー2
 ```
 
@@ -181,7 +181,7 @@ $ rm id_rsa.pub
 vim ~/.ssh/config
 ```
 
-```~/.ssh/config
+```shell
 Host testServer # 任意の名前
   HostName aaa.bbb.ccc.ddd # IPアドレスまたはFQDN
   User test # ログインするユーザー

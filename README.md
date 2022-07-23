@@ -1,3 +1,3 @@
-# blog
+# Blog
 
-blog by Gatsby
+[techblog](https://memo.kkenya.com/) by Gatsby
