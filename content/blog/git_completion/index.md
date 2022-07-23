@@ -47,7 +47,7 @@ $ which git
 
 ```shell
 $ ls /usr/local/etc/bash_completion.d
-brew			git-completion.bash	git-prompt.sh		nodebrew		npm
+brew   git-completion.bash git-prompt.sh  nodebrew  npm
 ```
 
 `git-completion.bash`と`git-prompt.sh`をシェルで読み込むように指定する。
