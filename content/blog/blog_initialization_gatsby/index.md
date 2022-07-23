@@ -1,5 +1,5 @@
 ---
-title: テックブログを開設する(Gatsby)
+title: Gatsbyでテックブログを開設する
 date: "2021-01-12T17:54:00+09:00"
 status: published
 ---

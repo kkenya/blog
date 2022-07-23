@@ -1,5 +1,5 @@
 ---
-title: linuxでユーザー作成とssh
+title: CentOSでユーザー作成とssh
 date: "2018-05-16T16:58:00+09:00"
 status: published
 ---
