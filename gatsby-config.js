@@ -5,10 +5,10 @@ require("dotenv").config({
 module.exports = {
   siteMetadata: {
     title: `蛙のテックブログ`,
-    description: `蛙のテックブログ`,
-    siteUrl: `https://blog.gekishiman.work`,
+    description: `Web系ソフトウェアエンジニアの備忘録`,
+    siteUrl: `https://memo.kkenya.com`,
     bio: {
-      description: `Web系エンジニアの備忘録`,
+      description: `Web系ソフトウェアエンジニアの備忘録`,
     },
   },
   plugins: [
@@ -68,59 +68,68 @@ module.exports = {
         },
       },
     },
-    // {
-    //   resolve: `gatsby-plugin-feed`,
-    //   options: {
-    //     query: `
-    //       {
-    //         site {
-    //           siteMetadata {
-    //             title
-    //             description
-    //             siteUrl
-    //             site_url: siteUrl
-    //           }
-    //         }
-    //       }
-    //     `,
-    //     feeds: [
-    //       {
-    //         serialize: ({ query: { site, allMarkdownRemark } }) => {
-    //           return allMarkdownRemark.nodes.map(node => {
-    //             return Object.assign({}, node.frontmatter, {
-    //               description: node.excerpt,
-    //               date: node.frontmatter.date,
-    //               url: site.siteMetadata.siteUrl + node.fields.slug,
-    //               guid: site.siteMetadata.siteUrl + node.fields.slug,
-    //               custom_elements: [{ "content:encoded": node.html }],
-    //             })
-    //           })
-    //         },
-    //         query: `
-    //           {
-    //             allMarkdownRemark(
-    //               sort: { order: DESC, fields: [frontmatter___date] },
-    //               filter: {frontmatter: {status: {eq: "published"}}},
-    //             ) {
-    //               nodes {
-    //                 excerpt
-    //                 html
-    //                 fields {
-    //                   slug
-    //                 }
-    //                 frontmatter {
-    //                   title
-    //                   date
-    //                 }
-    //               }
-    //             }
-    //           }
-    //         `,
-    //         output: "/rss.xml",
-    //       },
-    //     ],
-    //   },
-    // },
+    // RSS feed
+    {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        query: `
+          {
+            site {
+              siteMetadata {
+                title
+                description
+                siteUrl
+                site_url: siteUrl
+              }
+            }
+          }
+        `,
+        feeds: [
+          {
+            title: "KKenya techblog's RSS Feed",
+            output: "/rss.xml",
+            query: `
+              {
+                allMarkdownRemark(
+                  filter: { frontmatter: { status: { eq: "published" } } },
+                  sort: { order: DESC, fields: [frontmatter___date] },
+                ) {
+                  edges {
+                    node {
+                      excerpt
+                      html
+                      fields {
+                        slug
+                      }
+                      frontmatter {
+                        title
+                        date
+                      }
+                    }
+                  }
+                }
+              }
+            `,
+            serialize: ({ query: { site, allMarkdownRemark } }) => {
+              return allMarkdownRemark.edges.map(edge => {
+                const { excerpt, fields, html, frontmatter } = edge.node
+                const { title, date } = frontmatter
+                const url = `${site.siteMetadata.siteUrl}${fields.slug}`
+
+                return {
+                  title,
+                  description: excerpt,
+                  date,
+                  url,
+                  guid: url,
+                  custom_elements: [{ "content:encoded": html }],
+                }
+              })
+            },
+          },
+        ],
+      },
+    },
     `gatsby-plugin-react-helmet`,
   ],
 }
