@@ -7,6 +7,9 @@ module.exports = {
     title: `蛙のテックブログ`,
     description: `Web系ソフトウェアエンジニアの備忘録`,
     siteUrl: `https://memo.kkenya.com`,
+    thumbnailUrl: `https://memo.kkenya.com/favicon.ico`,
+    articleDefaultImageUrl: `https://memo.kkenya.com/aritcle_default_image.jpg`,
+    articleDefaultImageSize: 1386534,
     bio: {
       description: `Web系ソフトウェアエンジニアの備忘録`,
     },
@@ -79,14 +82,18 @@ module.exports = {
                 title
                 description
                 siteUrl
+                thumbnailUrl
+                articleDefaultImageUrl
+                articleDefaultImageSize
                 site_url: siteUrl
+                image_url: thumbnailUrl
               }
             }
           }
         `,
         feeds: [
           {
-            title: "KKenya techblog's RSS Feed",
+            title: "KKenya Tech Blog",
             output: "/rss.xml",
             query: `
               {
@@ -114,7 +121,12 @@ module.exports = {
               return allMarkdownRemark.edges.map(edge => {
                 const { excerpt, fields, html, frontmatter } = edge.node
                 const { title, date } = frontmatter
-                const url = `${site.siteMetadata.siteUrl}${fields.slug}`
+                const {
+                  siteUrl,
+                  articleDefaultImageUrl,
+                  articleDefaultImageSize,
+                } = site.siteMetadata
+                const url = `${siteUrl}${fields.slug}`
 
                 return {
                   title,
@@ -123,6 +135,11 @@ module.exports = {
                   url,
                   guid: url,
                   custom_elements: [{ "content:encoded": html }],
+                  // TODO: frontmatterで記事ごとに指定可能にする, サイズをどう的に算出する
+                  enclosure: {
+                    url: articleDefaultImageUrl,
+                    size: articleDefaultImageSize,
+                  },
                 }
               })
             },
