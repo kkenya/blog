@@ -49,6 +49,7 @@
     "gatsby-cli": "^4.18.1",
     "prettier": "2.7.1",
     "textlint": "^12.2.1",
+    "textlint-filter-rule-comments": "^1.2.2",
     "textlint-rule-preset-ja-technical-writing": "^7.0.0",
     "textlint-rule-preset-jtf-style": "^2.3.13"
   }

@@ -135,3 +135,4 @@ for (const { ...feed } of arr) {
 
 - [GatsbyJSでRSSフィードを作成](https://www.ya-n.com/blog/2019-07-24-rss-feed/)
 - [www.rssboard.org](https://www.rssboard.org/rss-draft-1#element-channel-item-enclosure)
+[](https://rpf-noblog.com/2020-05-10/gatsby-hero/)

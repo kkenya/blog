@@ -1,10 +1,10 @@
 rules:
-  # https://github.com/proofdict/proofdict/tree/master/packages/@proofdict/textlint-rule-proofdict
-  "@proofdict/proofdict":
-    dictURL: "https://azu.github.io/proof-dictionary/"
   # JTF日本語標準スタイルガイド（翻訳用）
   # https://github.com/textlint-ja/textlint-rule-preset-JTF-style
   preset-jtf-style: true
   # 技術文書向けプリセット
   # https://github.com/textlint-ja/textlint-rule-preset-ja-technical-writing
   preset-ja-technical-writing: true
+  # https://github.com/proofdict/proofdict/tree/master/packages/@proofdict/textlint-rule-proofdict
+  "@proofdict/proofdict":
+    dictURL: "https://azu.github.io/proof-dictionary/"
