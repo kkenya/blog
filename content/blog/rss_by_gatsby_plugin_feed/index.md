@@ -4,9 +4,9 @@ date: "2022-07-23T15:31:54+09:00"
 status: published
 ---
 
-GatsbyのブログにRSSフィードを導入した
+GatsbyのブログにRSSフィードを導入した。
 
-ドキュメントの[Adding an RSS Feed](https://www.gatsbyjs.com/docs/how-to/adding-common-features/adding-an-rss-feed/)に従って実装
+ドキュメントの[Adding an RSS Feed](https://www.gatsbyjs.com/docs/how-to/adding-common-features/adding-an-rss-feed/)に従って実装。
 
 ## 環境
 
@@ -22,13 +22,13 @@ npm install gatsby-plugin-feed
 
 ### 設定
 
-gatsby-plugin-feedは内部的に[dylang/node-rss](https://github.com/dylang/node-rss)を利用しており、クエリのフィールド名はこのパッケージのオプションに対応する
+gatsby-plugin-feedは内部的に[dylang/node-rss](https://github.com/dylang/node-rss)を利用しており、クエリのフィールド名はこのパッケージのオプションに対応する。
 
-`query` オプションですべてのRSSに共通したフィールドを指定する
+`query` オプションですべてのRSSに共通したフィールドを指定する。
 
 [このクエリは `baseQuery` として `feeds` の各要素のクエリ実行結果に統合される](https://github.com/gatsbyjs/gatsby/blob/45bb97ab545e7e597123cac14331e3633d719d63/packages/gatsby-plugin-feed/src/gatsby-node.js#L28)
 
-例えば `gatsby-config.js` に設定したメタ情報である `siteUrl` をnode-rssのオプションである `site_url` に指定している
+例えば `gatsby-config.js` に設定したメタ情報である `siteUrl` をnode-rssのオプションである `site_url` に指定している。
 
 ```js
     {
@@ -48,25 +48,24 @@ gatsby-plugin-feedは内部的に[dylang/node-rss](https://github.com/dylang/nod
         `,
 ```
 
-`feeds` はファイル(locale)ごとに設定する
-生成するファイルが一つなら要素は一つとなる
+`feeds` はファイル（locale）ごとに設定する。生成するファイルが1つなら要素は1つとなる。
 
-`feeds` の各要素では `output` , `query` , `title` , `serialize` が必須
-`serialize` には `options.query` のクエリとfeedごとの `options.feeds[n].qeury` を統合した実応結果が引数に渡される
+`feeds` の各要素では `output` , `query` , `title` , `serialize` が必須。
+`serialize` には `options.query` のクエリとfeedごとの `options.feeds[n].qeury` を統合した実応結果が引数に渡される。
 
-例では `site` と `allMarkdownRemark`
-`serialize` 関数の返り値はnode-rssの[itemOptions](https://github.com/dylang/node-rss#itemoptions)に対応する
+例では `site` と `allMarkdownRemark`。
+`serialize` 関数の返り値はnode-rssの[itemOptions](https://github.com/dylang/node-rss#itemoptions)に対応する。
 
 ### RSSフィードの画像と記事ごとの画像を設定する
 
-`gatsby-config.js` の `siteMetadata` にサムネイルのURL, 拡張子を設定
+`gatsby-config.js` の `siteMetadata` にサムネイルのURL, 拡張子を設定。
 
 ```js
     siteUrl: `https://memo.kkenya.com`,
     thumbnailUrl: `https://memo.kkenya.com/favicon.ico`,
 ```
 
-gatsby-plugin-feedの `options.query` にフィードの画像 `image_url` の指定
+gatsby-plugin-feedの `options.query` にフィードの画像 `image_url` の指定。
 
 ```graphql
           {
@@ -85,9 +84,9 @@ gatsby-plugin-feedの `options.query` にフィードの画像 `image_url` の�
           }
 ```
 
-`seriarize` 関数で `enclosure` を指定
+`seriarize` 関数で `enclosure` を指定する。
 
-一旦共通で設定、frontmatterで記事ごとに設定可能にし、なければdefaltの画像を取得するなどの対応を行う
+一旦共通で設定、frontmatterで記事ごとにOGP画像を設定可能にし、なければデフォルトの画像を取得するなどの対応。
 
 ```graphql
 enclosure: {
@@ -98,7 +97,7 @@ enclosure: {
 
 ### ビルド
 
-ビルドして確認
+ビルドして確認。
 
 ```shell
 gatsby build && gatsby serve
@@ -106,13 +105,15 @@ gatsby build && gatsby serve
 
 ### 動作確認
 
-`/rss.xml` にアクセス (e.g. `http://localhost:9000/rss.xml` )してそれぞれのフィールドが有効か確認
+`/rss.xml` にアクセス (e.g. `http://localhost:9000/rss.xml` )してそれぞれのフィールドが有効か確認。
 
-デプロイがRSSリーダーでフィード、画像の取得などができていることを確認
+デプロイがRSSリーダーでフィード、画像の取得などができていることを確認。
 
 ## メモ
 
-### for...ofで配列の要素をimmutableに操作していた
+### gatsby-plugin-feedでfor...ofを利用し配列の要素をimmutableに操作していた
+
+[gatsby/packages/gatsby-plugin-feed/src/gatsby-node.js](https://github.com/gatsbyjs/gatsby/blob/564a8f7358edd2599199e79c902468fa83f916b2/packages/gatsby-plugin-feed/src/gatsby-node.js#L25)のコードリーディングで詰まったのでメモ。
 
 ```js
 arr = [
