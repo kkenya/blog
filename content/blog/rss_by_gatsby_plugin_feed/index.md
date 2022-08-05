@@ -56,18 +56,29 @@ gatsby-plugin-feedは内部的に[dylang/node-rss](https://github.com/dylang/nod
 例では `site` と `allMarkdownRemark`。
 `serialize` 関数の返り値はnode-rssの[itemOptions](https://github.com/dylang/node-rss#itemoptions)に対応する。
 
-### RSSフィードの画像と記事ごとの画像を設定する
+### RSSフィードに画像を設定する
 
-`gatsby-config.js` の `siteMetadata` にサムネイルのURL, 拡張子を設定。
+`gatsby-config.js` の `siteMetadata` にサムネイルのURLを設定。
 
 ```js
+module.exports = {
+  siteMetadata: {
+    title: `蛙のテックブログ`,
+    description: `Web系ソフトウェアエンジニアの備忘録`,
     siteUrl: `https://memo.kkenya.com`,
     thumbnailUrl: `https://memo.kkenya.com/favicon.ico`,
+    // ...省略
+  }
+}
 ```
 
-gatsby-plugin-feedの `options.query` にフィードの画像 `image_url` の指定。
+gatsby-plugin-feedの `options.query` に画像URL `image_url` を指定。
 
-```graphql
+```js
+    {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        query: `
           {
             site {
               siteMetadata {
@@ -75,29 +86,73 @@ gatsby-plugin-feedの `options.query` にフィードの画像 `image_url` の�
                 description
                 siteUrl
                 thumbnailUrl
-                articleDefaultImageUrl
-                articleDefaultImageSize
                 site_url: siteUrl
                 image_url: thumbnailUrl
               }
             }
           }
+        `,
+        feeds: [
 ```
 
+### 記事ごとの画像設定
+
 `seriarize` 関数で `enclosure` を指定する。
+全ての記事で共通の画像を設定した。frontmatterで記事ごとにogp画像を設定可能にし、なければデフォルトの画像を取得するなどの対応が考えられる。
 
-一旦共通で設定、frontmatterで記事ごとにOGP画像を設定可能にし、なければデフォルトの画像を取得するなどの対応。
+```js
+module.exports = {
+  siteMetadata: {
+    // ...
+    articleDefaultImageUrl: `${siteUrl}/aritcle_default_image.jpg`,
+    articleDefaultImageSize: 1386534,
+  },
+  plugins: [
+    {
+      resolve: `gatsby-plugin-feed`,
+      options: {
+        query: ``,
+        feeds: [
+          {
+            title: "KKenya TechBlog",
+            output: "/rss.xml",
+            query: ``,
+            serialize: ({ query: { site, allMarkdownRemark } }) => {
+              return allMarkdownRemark.edges.map(edge => {
+                const { excerpt, fields, html, frontmatter } = edge.node
+                const { title, date } = frontmatter
+                const {
+                  siteUrl,
+                  articleDefaultImageUrl,
+                  articleDefaultImageSize,
+                } = site.siteMetadata
+                const url = `${siteUrl}${fields.slug}`
 
-```graphql
-enclosure: {
-  url: articleDefaultImageUrl,
-  size: articleDefaultImageSize,
-},
+                return {
+                  title,
+                  description: excerpt,
+                  date,
+                  url,
+                  guid: url,
+                  custom_elements: [{ "content:encoded": html }],
+                  enclosure: {
+                    url: articleDefaultImageUrl,
+                    size: articleDefaultImageSize,
+                  },
+                }
+              })
+            },
+          },
+        ],
+      },
+    },
+  ],
+}
 ```
 
 ### ビルド
 
-ビルドして確認。
+devサーバーでは確認できないため、ビルドして確認する。
 
 ```shell
 gatsby build && gatsby serve
@@ -105,9 +160,25 @@ gatsby build && gatsby serve
 
 ### 動作確認
 
-`/rss.xml` にアクセス (e.g. `http://localhost:9000/rss.xml` )してそれぞれのフィールドが有効か確認。
+`/rss.xml` にアクセス (e.g. `http://localhost:9000/rss.xml` )して確かめる。
 
-デプロイがRSSリーダーでフィード、画像の取得などができていることを確認。
+- 生成できている
+- 画像が設定されている
+- HTMLの `head` にフィードのリンクが設定されている
+
+```html
+<link rel="alternate" type="application/rss+xml" title="KKenya TechBlog" href="/rss.xml">
+```
+
+デプロイ後は実際にRSSリーダーでフィードの購読、サムネイル画像が表示されていること。
+
+### [Feed Validation Service](https://validator.w3.org/feed/)
+
+W3CのFeed Validation Serviceで仕様に準拠しているか検証できる。
+URLを入力しCheckを実行すると、RSSフィードを取得され有効な形式であること・より適切な形式があるか確認できる。
+生成したXMLを `Validate by Direct Input` に入力し、ローカルのXMLを検証することも可能。
+
+![rss_feed_validator_result](./rss_feed_validator_result.png)
 
 ## メモ
 
@@ -134,6 +205,6 @@ for (const { ...feed } of arr) {
 
 ### 参考
 
-- [GatsbyJSでRSSフィードを作成](https://www.ya-n.com/blog/2019-07-24-rss-feed/)
 - [www.rssboard.org](https://www.rssboard.org/rss-draft-1#element-channel-item-enclosure)
-[](https://rpf-noblog.com/2020-05-10/gatsby-hero/)
+- [GatsbyJSでRSSフィードを作成](https://www.ya-n.com/blog/2019-07-24-rss-feed/)
+- [RSS・AtomフィードはValidatorでチェックしよう](https://torum.hatenablog.com/entry/2021/06/23/094834)

@@ -6,16 +6,16 @@ status: published
 
 ブログを作るにあたり、マークダウンで記述できることを最低要件とした。
 
-記事の管理はマークダウンで管理できればよく、よく見かける構成としてMicroCMSやなどのCMSを利用して記事を管理するパターンがあるが次の理由で採用しなかった。
+記事の管理はマークダウンで管理できればよく、よく見かける構成としてMicroCMSやContentfulなどのCMSを利用して記事を管理するパターンがあるが次の理由で採用しなかった。
 
-- 記事はVSCodeなどを利用してPCで編集するためCSMから提供されるマークダウンエディタを活用する機会がない
-- 外部サービスの更新に常に追従できるわけではなく依存を減らしたかった
+- 記事はVSCodeなどを利用してPCで編集するため、CSMから提供されるマークダウンエディタを活用する機会がない
+- 個人開発のプロダクトなので仕事が忙しい場合はメンテナンスに時間が割けないことは明らかだったので外部サービスの依存を減らしたかった
 - APIコールによる従量課金を考えると記事の表示ごとにCSRせず、デプロイ時に全ての記事を取得しSSGする方法が望ましいが、この構成でCMSを利用する利点がCMSを管理する欠点を上回らなかった
 
 記事のマークダウンはブログのソースコードに含め、GitHubで管理する。
 以上のことから[Gatsby](https://www.gatsbyjs.com/)によるSSGで静的サイトを生成し、S3でホスティングした。
 
-### Gatsbyでやったこと
+### Gatsbyの学習
 
 チュートリアルをこなして、基本的な開発の進め方とプラグインの使い方を学んだ。
 
@@ -27,7 +27,9 @@ status: published
 
 ## 利用しているパッケージについて
 
-### Plugin, Transformer
+gatsby-starter-blogで利用されているパッケージを把握した。
+
+### Plugin/Transformer
 
 #### [gatsby-plugin-image](https://www.gatsbyjs.com/plugins/gatsby-plugin-image/)
 
@@ -162,7 +164,7 @@ require("dotenv").config({
 
 環境変数の読み込みをサポートする `dotenv` は `gatsby` にプリインストールされているためインストールは不要。
 
-## Google Analyticsの設定
+## Google Analyticsを設定
 
 [gatsby-plugin-google-gtag](https://www.gatsbyjs.com/plugins/gatsby-plugin-google-gtag)を導入し、Google Analyticsを有効にする。
 Google Analyticsで発行したtrackingIdを環境変数から読み込み、スクリプトのタグを `<head>` セクションに設定するためオプションを指定。

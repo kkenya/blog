@@ -17,10 +17,6 @@ status: published
 
 ![changed prompt result](result.png)
 
-## 環境
-
-- bash
-
 ## プロンプトを制御する環境変数
 
 プロンプトは環境変数 `PS1` で定義されているので、環境変数を出力して確認。

@@ -2,14 +2,16 @@ require("dotenv").config({
   path: `.env.${process.env.NODE_ENV}`,
 })
 
+const siteUrl = `https://memo.kkenya.com`;
+
 module.exports = {
   siteMetadata: {
     title: `蛙のテックブログ`,
     description: `Web系ソフトウェアエンジニアの備忘録`,
-    siteUrl: `https://memo.kkenya.com`,
-    thumbnailUrl: `https://memo.kkenya.com/favicon.ico`,
-    articleDefaultImageUrl: `https://memo.kkenya.com/aritcle_default_image.jpg`,
-    articleDefaultImageSize: 1386534,
+    siteUrl,
+    thumbnailUrl: `${siteUrl}/thumbnail.jpg`,
+    articleDefaultImageUrl: `${siteUrl}/thumbnail.jpg`,
+    articleDefaultImageSize: 740417,
     bio: {
       description: `Web系ソフトウェアエンジニアの備忘録`,
     },
@@ -93,7 +95,7 @@ module.exports = {
         `,
         feeds: [
           {
-            title: "KKenya Tech Blog",
+            title: "KKenya TechBlog",
             output: "/rss.xml",
             query: `
               {
@@ -135,7 +137,6 @@ module.exports = {
                   url,
                   guid: url,
                   custom_elements: [{ "content:encoded": html }],
-                  // TODO: frontmatterで記事ごとに指定可能にする, サイズをどう的に算出する
                   enclosure: {
                     url: articleDefaultImageUrl,
                     size: articleDefaultImageSize,
