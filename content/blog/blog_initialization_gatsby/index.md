@@ -1,19 +1,21 @@
 ---
-title: Gatsbyでテックブログを開設する
+title: Gatsbyでテックブログを開設した
 date: "2021-01-12T17:54:00+09:00"
 status: published
 ---
 
-ブログを作るにあたり、マークダウンで記述できることを最低要件とした。
+## 背景
 
-記事の管理はマークダウンで管理できればよく、よく見かける構成としてMicroCMSやContentfulなどのCMSを利用して記事を管理するパターンがあるが次の理由で採用しなかった。
+ブログを作るにあたり、マークダウンで記述できることを要件とした。
+また、サーバーを運用するコストを減らすためSSGで生成したドキュメントをS3などのクラウドストレージにホスティングすることとした。
+
+よく見かける構成としてMicroCMSやContentfulなどのCMSを利用して記事を管理するパターンがあるが次の理由で採用しなかった。
 
 - 記事はVSCodeなどを利用してPCで編集するため、CSMから提供されるマークダウンエディタを活用する機会がない
 - 個人開発のプロダクトなので仕事が忙しい場合はメンテナンスに時間が割けないことは明らかだったので外部サービスの依存を減らしたかった
 - APIコールによる従量課金を考えると記事の表示ごとにCSRせず、デプロイ時に全ての記事を取得しSSGする方法が望ましいが、この構成でCMSを利用する利点がCMSを管理する欠点を上回らなかった
 
-記事のマークダウンはブログのソースコードに含め、GitHubで管理する。
-以上のことから[Gatsby](https://www.gatsbyjs.com/)によるSSGで静的サイトを生成し、S3でホスティングした。
+以上のことから[Gatsby](https://www.gatsbyjs.com/)を利用し、マークダウンはソースコードに含めGitHubで管理する。
 
 ### Gatsbyの学習
 
@@ -25,7 +27,109 @@ status: published
 
 生成したブログからプロフィールなどを書き換えていく。Twitterなどのアカウントプロフィールを表示している項目のことをBiographyの先頭をとってBio（バイオ）と言うらしい。
 
-## 利用しているパッケージについて
+## 環境変数の読み込みを有効にする
+
+[Environment Variables](https://www.gatsbyjs.com/docs/how-to/local-development/environment-variables/)を参考に実装した。
+
+`.env.development` , `.env.production` を追加し、`gatsby-config.js` で環境変数の読み込みを有効にする。
+
+```js
+require("dotenv").config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+```
+
+環境変数の読み込みをサポートする `dotenv` は `gatsby` にプリインストールされているためインストールは不要。
+
+## Google Analyticsを設定
+
+[gatsby-plugin-google-gtag](https://www.gatsbyjs.com/plugins/gatsby-plugin-google-gtag)を導入し、Google Analyticsを有効にする。
+Google Analyticsで発行したtrackingIdを環境変数から読み込み、スクリプトのタグを `<head>` セクションに設定するためオプションを指定。
+
+```js
+{
+  resolve: `gatsby-plugin-google-gtag`,
+  options: {
+    trackingIds: [
+      process.env.GOOGLE_ANALYTICS_TRACKING_ID, // Google Analytics / GA
+    ],
+    pluginConfig: {
+      head: true,
+    },
+  },
+},
+```
+
+ビルド後、ドキュメントからスクリプトが埋め込まれていることを確認。
+
+```shell
+gatsby build
+gatsby serve
+```
+
+```html
+<html>
+    <head>
+      <script type="module">
+        <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXX"></script>
+      </script>
+    </head>
+</html>
+```
+
+### 自宅のIPアドレスを計測から除外する
+
+Google Analyticsのコンソールから「管理 > データストリーム」を選択。
+
+ストリームを選択し、「タグ付けの詳細設定」から「内部トラフィック ルール」を設定。
+
+|項目|値|
+|:--|:--|
+|ルール名|自宅|
+|traffic_type の値|internal|
+|IP アドレス > マッチタイプ|IPアドレスが次と等しい|
+|IP アドレス > 値|確認したGIP|
+
+### Google シグナルを有効にする
+
+コンソールの「管理 > 設定 > データ設定 > データ収集」から有効にする。
+
+## [Google Search](https://search.google.com/search-console)
+
+検索エンジンでのパフォーマンスを分析できるツール。
+
+`kkenya.com` をGoogle Domainで取得したため、所有権の確認が自動的に完了していた
+`お名前.com` などの外部サービスでドメインを取得した場合は、[確認方法に従い](https://support.google.com/webmasters/answer/9008080?hl=ja#choose_method&zippy=)対応する必要がある。
+
+### [Google Search Console Insights](https://search.google.com/search-console/insights/)
+
+Google Analyticsと連携することでページビュー数やアクセス経路を確認できる。
+GitHubのREADMEからの被リンクで流入があったことを確認できた。
+
+![page views for Google Search Console Insights](./google_search_console_insights_page_views.png)
+
+### URL検査ツール
+
+指定したURLがGoogleにインデックスされているか確認できる。
+実行したところ登録されていなかった。
+
+![inspect url for Google Search Console](./google_search_console_inspect_url.png)
+
+「公開URLをテスト」を実行した結果、登録可能だったのでリクエストした。
+
+![inspected result for Google Search Console](./google_search_console_inspected_result.png)
+
+## メモ
+
+### サイトがGoogleのインデックスに登録されているか調べる
+
+Googleの検索でクエリを指定する。
+
+```text
+site:memo.kkenya.com
+```
+
+## gatsby-starter-blogで利用しているパッケージについて
 
 gatsby-starter-blogで利用されているパッケージを把握した。
 
@@ -149,70 +253,3 @@ RSSを作成する。
 #### [gatsby-plugin-react-helmet](https://www.gatsbyjs.com/plugins/gatsby-plugin-react-helmet/)
 
 `react-helmet` を利用してHTMLドキュメントのHEADのメタタグなどを制御できる。
-
-## 環境変数の読み込みを有効にする
-
-[Environment Variables](https://www.gatsbyjs.com/docs/how-to/local-development/environment-variables/)を参考に実装した。
-
-`.env.development` , `.env.production` を追加し、`gatsby-config.js` で環境変数の読み込みを有効にする。
-
-```js
-require("dotenv").config({
-  path: `.env.${process.env.NODE_ENV}`,
-})
-```
-
-環境変数の読み込みをサポートする `dotenv` は `gatsby` にプリインストールされているためインストールは不要。
-
-## Google Analyticsを設定
-
-[gatsby-plugin-google-gtag](https://www.gatsbyjs.com/plugins/gatsby-plugin-google-gtag)を導入し、Google Analyticsを有効にする。
-Google Analyticsで発行したtrackingIdを環境変数から読み込み、スクリプトのタグを `<head>` セクションに設定するためオプションを指定。
-
-```js
-{
-  resolve: `gatsby-plugin-google-gtag`,
-  options: {
-    trackingIds: [
-      process.env.GOOGLE_ANALYTICS_TRACKING_ID, // Google Analytics / GA
-    ],
-    pluginConfig: {
-      head: true,
-    },
-  },
-},
-```
-
-ビルド後、ドキュメントからスクリプトが埋め込まれていることを確認。
-
-```shell
-gatsby build
-gatsby serve
-```
-
-```html
-<html>
-    <head>
-      <script type="module">
-        <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXX"></script>
-      </script>
-    </head>
-</html>
-```
-
-### 自宅のIPアドレスを計測から除外する
-
-Google Analyticsのコンソールから「管理 > データストリーム」を選択。
-
-ストリームを選択し、「タグ付けの詳細設定」から「内部トラフィック ルール」を設定。
-
-|項目|値|
-|:--|:--|
-|ルール名|自宅|
-|traffic_type の値|internal|
-|IP アドレス > マッチタイプ|IPアドレスが次と等しい|
-|IP アドレス > 値|確認したGIP|
-
-### Google シグナルを有効にする
-
-コンソールの「管理 > 設定 > データ設定 > データ収集」から有効にする。
