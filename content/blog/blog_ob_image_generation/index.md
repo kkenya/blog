@@ -112,16 +112,16 @@ Cache-Controlの管理
 - [Node.jsで動的なOGP画像の生成方法。軽量で環境に影響されない方法](https://std9.jp/articles/01fz9fve2cykj764xqqtbrc1dt)
   - opentype.jsでCSVを生成し、sharpでPNGに変換した画像を返すAPIを実装
 - [cookpad レシピページのOGP画像を動的に生成する](https://techlife.cookpad.com/entry/dynamic-og-image)
-  - ヘッドレスブラウザ(puppeteer)のレンダリング結果を画像として返すAPI
+  - ヘッドレスブラウザ（puppeteer）のレンダリング結果を画像として返すAPI
   - 300万以上のコンテンツがあり、すべてでOGP画像の生成が必要ではないためリクエストのタイミングで画像を生成
 - [Cloud Functions + ImageMagickでOPG画像の動的生成してCloud Storageにアップロードする](https://www.memory-lovers.blog/entry/2019/06/26/194500)
-  - Cloud FunctionでImageMagicで生成した画像のURLを返す
+  - Cloud FunctionでImageMagicの生成した画像URLを返す
 - [FirebaseCloudFunctionsとcanvasだけで動的にOGP画像を生成し2020年を生き延びよう](https://qiita.com/_masaokb/items/4e5e7c91d3a582f60e5f)
   - node-canvasで生成した画像をCloud Strageにアップロードし、リダイレクトするAPI
 - [Cloud FunctionsでSSRして、OGPタグを動的に書き換える](https://zenn.dev/nshhhin/articles/nicody-firebase-ogp)
-  - コンテンツが公開に設定された際に画像を生成し、ページ取得のリクエストでCloud FunctionsがOGPのメタタグを正規表現で書き換える
+  - コンテンツが公開設定された際に画像を生成し、Cloud Functionsがページ取得のリクエストでOG画像のメタタグを正規表現により書き換える
 - [Cloudflare Workers で OG 画像を生成する](https://blog.keiya01.dev/entry/og-image-in-workers/)
-  - Cloudflare Workersでnode-canvasで生成した画像を返す
+  - Cloudflare Workersでnode-canvasの生成した画像を返す
 - [SSGなサイトでOGP画像を動的生成したい](https://speakerdeck.com/kubotak/ssgnasaitodeogphua-xiang-wodong-de-sheng-cheng-sitai)
   - sharpとtext-svgでの事前生成
   - 形態素解析を利用し単語の区切りで改行する
