@@ -1,12 +1,16 @@
 ---
-title: CodeBuildのAmazon Linuxでnode16を利用する
+title: CodeBuildのamazonlinux2-x86_64-standard:2.0でnode16を利用する
 date: "2022-06-04T23:30:00+09:00"
 status: published
 ---
 
+### 追記
+
+`aws/codebuild/amazonlinux2-x86_64-standard:4.0` でのランタイムにnode16が選択できる。また、2022-06-20以降 `aws/codebuild/amazonlinux2-x86_64-standard:2.0` のイメージはサポート対象外となる。
+
 ## 結論
 
-Amazon LinuxのNodejs12を利用し、ビルドごとにNodejsの16系をインストールする
+サポートされるランタイムであるNodejs12を指定し、ビルドインされたバージョン管理ツールによりビルドごとにNodejs16へ切り替える。
 
 ```yaml
 phases:
@@ -19,16 +23,18 @@ phases:
 
 ## 経緯
 
-2022/6/9時点でUbuntuとAmazon Linux 2で利用可能なランタイムにnodejs16は含まれないため、 `runtime-versions` で直接指定することはできない
+2022/6/9時点でUbuntuとAmazon Linux 2で利用可能なランタイムにnodejs16は含まれないため、 `runtime-versions` で直接指定できない。
 
 |runtime|nodejs|
 |:--|:--|
 |Amazon Linux 2|12|
 |Ubuntu standard:5.0|14|
 
-ランタイムとしてサポートされていないので、ビルドの実行前にプリインストールされたNodejsのバージョン管理ツールを利用し16系をインストールする
+ランタイムとしてサポートされていないので、ビルドの実行前にプリインストールされたNodejsのバージョン管理ツールを利用し16系をインストールする。
 
-Amazon Linuxでは[n](https://github.com/tj/n)を利用しているので `n 利用したいバージョン` でインストールする([Dockerfile](https://github.com/aws/aws-codebuild-docker-images/blob/282c6634e8c83c2a9841719b09aabfced3461981/al2/x86_64/standard/3.0/Dockerfile#L133)で `n` をインストールしている箇所)
+Amazon Linuxでは[n](https://github.com/tj/n)を利用しているので `n 利用したいバージョン` でインストールする。
+
+- [Dockerfile](https://github.com/aws/aws-codebuild-docker-images/blob/282c6634e8c83c2a9841719b09aabfced3461981/al2/x86_64/standard/3.0/Dockerfile#L133)で `n` をインストールしている箇所
 
 ## 参考
 
