@@ -90,3 +90,8 @@ Sawarabi Gothic
 
 全然フォントが使えない
 Google Font利用できると言っているが、片っ端から指定して利用できたの一つ...
+
+## [gatsby-react-helmet](https://www.gatsbyjs.com/plugins/gatsby-plugin-react-helmet/)
+
+`React Helmet` でドキュメントheadにelemntを追加できる
+`gatsby@^4.19.0` 以降はDocument headを追加できるGatsby Head APIの利用が推奨され、今deprecatedとなる。

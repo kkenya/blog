@@ -52,6 +52,12 @@ const Seo = ({ description, lang, meta, title }) => {
           content: `website`,
         },
         {
+          property: `og:image`,
+          content: new URL(
+            `https://res.cloudinary.com/memo-kkenya-com/image/upload/l_text:Sawarabi Gothic_48:${title},co_rgb:454545,w_1045,c_fit/v1659977684/ogp/og_image_ge1u4n.png`
+          ).toString(),
+        },
+        {
           name: `twitter:card`,
           content: `summary`,
         },
