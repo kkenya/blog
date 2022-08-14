@@ -104,6 +104,12 @@ Cache-Controlの管理
 画像を生成しておくパターン
 既存の記事どうする？
 
+## バリデーター
+
+- [LINE](https://poker.line.naver.jp)
+_ [Facebook](https://developers.facebook.com/tools/debug/)
+- [Twitter](https://cards-dev.twitter.com/validator)
+
 ## 参考
 
 - [サイトのOGP画像を自動生成する](https://zenn.dev/panda_program/articles/generate-og-image)
