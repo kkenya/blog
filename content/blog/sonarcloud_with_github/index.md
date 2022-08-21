@@ -15,6 +15,10 @@ publicなリポジトリならSonarCloudによる静的解析を無料で利用�
 - Jest
 - Visual Studio Code
 
+## Repository
+
+- [kkenya/sonarcloud-practice](https://github.com/kkenya/sonarcloud-practice)
+
 ## Sonar
 
 コードの静的解析ツール。20以上の言語に対応しており、保守性や脆弱性に影響を及ぼす可能性のあるコードを報告してくれる。また、次の3つのプロダクトを提供する。
