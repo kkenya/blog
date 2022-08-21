@@ -111,10 +111,9 @@ Publicなリポジトリなので無料プランを選択できる。
 
 ## Quality Gate
 
-Quality Gateは現在のコードがリリースに値するかの指標を提供する。解析にはコード全体に適用される条件と新しいコードに適用される条件を区別し、新しいコードの解析結果から測定される。
+Quality Gateは現在のメインブランチのコードがリリースに値するかの指標を提供する。解析にはコード全体に適用される条件と新しいコードに適用される条件を区別し、新しいコードの解析結果から測定される。
 
-Sonar Way: Built-in
-Example QG: custom-defined
+![quality gate on SonarCloud](./images/sonarcloud_quality_gate.png)
 
 ### New Code
 
@@ -144,11 +143,13 @@ New Codeの定義後にSonarCloudの解析を再度実施するとOverviewの「
 
 ## CI-based Analysis
 
-CI-based AnalysisはPull Requestごとに変更のあったコードのみを対象とした静的解析。
+CI-based AnalysisはメインブランチへのマージやPull Requestごとに変更のあったコードのみを対象とした静的解析。
+
+![SonarCloud report on Pull Request](./images/ci_based_analytics_complete.png)
 
 GitHubのリポジトリをセットアップ後は[Automatic Analysis](https://docs.sonarcloud.io/advanced-setup/automatic-analysis/)が自動で有効となる。Automatic Analysisは自動でPull Request、メインブランチの静的解析を行うが、CI-based Analysisと併用できないため無効にする（変更には管理者権限が必要）。
 
-![turn off automatic analytics method](./images/administrator_analytics_method_turn_off.png)
+![turn off automatic analytics method](./images/administrator_automatic_analytics_method_turn_off.png)
 
 GitHub Actionsの手順に従い、設定する。
 
@@ -236,10 +237,6 @@ SonarCloudにカバレッジリポートのパスを指定する。Jestは `./co
 ```conf
 sonar.javascript.lcov.reportPaths=./coverage/lcov.info
 ```
-
-正しく設定できれば、Pull Requestに解析結果が報告される。
-
-![SonarCloud report on Pull Request](./images/ci_based_analytics_complete.png)
 
 ## Badges
 
