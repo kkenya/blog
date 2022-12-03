@@ -44,6 +44,36 @@ Enter passphrase for key '~/.ssh/id_ed25519_github':
 Hi kkenya! You've successfully authenticated, but GitHub does not provide shell access.
 ```
 
+## パスフレーズの保存
+
+`.ssh/config` を編集し次の値を追加する。
+
+```txt
+Host *.github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519_github
+```
+
+ssh-agentを起動する。
+
+```shell
+eval "$(ssh-agent -s)"
+```
+
+sshごとにパスフレーズの入力が必要ないようkeychainに保存する。
+
+```shell
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519_github
+```
+
+パスフレーズを正しく入力できていればテストに成功する。
+
+```shell
+$ ssh -T git@github.com
+Hi kkenya! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
 ## 参考
 
 - [GitHub | Connect with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
