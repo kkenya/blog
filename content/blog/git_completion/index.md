@@ -4,6 +4,13 @@ date: "2018-12-04T06:42:00.000Z"
 status: published
 ---
 
+macの移行に伴い、最新のgitインストールから補完設定までを行ったメモ。
+
+## 環境
+
+- zsh 5.9 (arm-apple-darwin21.3.0)
+- macOS Monterey 12.6
+
 ## homebrewで最新のGitを利用する
 
 Macにプリインストールされているgitはバージョンが古いので、homebrewでインストールしたgitに移行する。
@@ -82,25 +89,100 @@ brewのパッケージをインストールするディレクトリは `prefix` 
 export PATH="$(brew --prefix)/bin:$PATH"
 ```
 
-## gitの補完を有効にする
+## gitの補完・プロンプト表示を有効にする
 
-先ほどインストールされた補完スクリプトのディレクトリを確認。
+GitHubのリポジトリにあるスクリプトを利用してgitの補完やプロンプトでのブランチ表示を有効にする。
 
-```shell
-$ ls /usr/local/etc/bash_completion.d
-brew   git-completion.bash git-prompt.sh  nodebrew  npm
-```
+- [git/contrib/completion/](https://github.com/git/git/tree/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion)
 
-`git-completion.bash`と`git-prompt.sh`をシェルで読み込むように指定する。
+各ファイルでGitHubからURLを取得し、行頭にあるコメントに従い有効にする。
 
-```shell
-# ~/.bash_profile
-source /usr/local/etc/bash_completion.d/git-completion.bash
-source /usr/local/etc/bash_completion.d/git-prompt.sh
-```
+### .git-prompt.sh
 
-シェルの設定ファイルを再度読み込む。
+環境変数 `PS1` に `__git_ps1` を呼び出すことで、プロンプトにgitリポジトリのステータスを表示可能になる。
+
+スクリプトをダウンロードする。
 
 ```shell
-source ~/.bash_profile
+% wget -O ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-prompt.sh
 ```
+
+`~/.zshrc` に読み込み設定する。
+
+```shell
+source ~/.git-prompt.sh
+```
+
+### .git-completion.bash
+
+サブコマンドやブランチ名などを補完できる。
+zshの場合はさらにこのスクリプトを扱うためのラッパーである `git-completion.zsh` を利用する。
+スクリプトをダウンロードする。
+
+```shell
+% wget -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-completion.bash
+```
+
+bashの場合はこのスクリプトを読み込むが、zshではラッパーを介して利用するためダウンロードのみで良い。
+
+### git-completion.zsh
+
+zshでgitの補完を利用するためのラッパースクリプト。
+
+スクリプトのダウンロード。
+
+```shell
+% wget -O ~/.zsh/_git https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-completion.zsh
+```
+
+`~/.zshrc` に読み込み設定を追加。
+
+```shell
+zstyle ':completion:*:*:git:*' script ~/.git-completion.bash
+fpath=(${HOME}/.zsh ${fpath})
+autoload -Uz compinit && compinit
+```
+
+### 確認
+
+.zshrcを読み込むかzshを起動しコマンドやブランチが補完されるか確認する。
+
+```shell
+. ~/.zshrc
+# または
+zsh
+```
+
+サブコマンドを途中まで入力する。続けてtabを入力し補完を確認。
+
+```shell
+% git pu
+pull  -- fetch from and merge with another repository or a local branch
+push  -- update remote refs along with associated objects
+```
+
+ブランチを途中まで入力する。続けてtabを入力し補完を確認。
+
+```shell
+% git pull o
+# tabを押す
+% git pull origin
+```
+
+## トラブルシュート
+
+### .git-completion.bashで `this script is obsolete, please see git-completion.zsh`
+
+zshで `.git-completion.bash` を読み込んでいる場合に警告される。
+
+- [`if [[ -n ${ZSH_VERSION-} && -z ${GIT_SOURCING_ZSH_COMPLETION-} ]]; then`](https://github.com/git/git/blob/7c2ef319c52c4997256f5807564523dfd4acdfc7/contrib/completion/git-completion.bash#L3561)
+
+#### なぜ変数の参照に `-` が含まれるか
+
+> bash は $BASH_VERSION、zsh は $ZSH_VERSION というシェル変数にバージョン文字列が入るため、これで種類の判定ができます。 ちなみに $VAR でなく ${VAR-} としているのは、 set -u (未定義パラメーターの展開をエラーとする) されている場合にも対応するためです。 bash はメジャー、マイナー、マイクロバージョン番号が $BASH_VERINFO に配列で設定されています。zsh は $ZSH_VERSION から切り分ける必要があります。 また、動作モードは bash は $BASH の値、zsh は emulate 組込みコマンドの出力で判定できます。
+
+- [シェルの種類とバージョンの検出 - 拡張 POSIX シェルスクリプト Advent Calendar 2013](https://fumiyas.github.io/2013/12/04/name-ver-mode.sh-advent-calendar.html)
+
+## `git-completion.zsh` の設定をしたがブランチが補完されない
+
+zshの補完設定に反映されていなかった。
