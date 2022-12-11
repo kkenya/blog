@@ -1,6 +1,7 @@
 ---
 title: macOSで設定しているgitの設定について
-date: "2018-12-04T06:42:00.000Z"
+# created: "2018-12-04T06:42:00.000Z"
+date: "2022-12-25T03:18:07.000Z"
 status: published
 ---
 
@@ -95,52 +96,40 @@ GitHubのリポジトリにあるスクリプトを利用してgitの補完や�
 
 - [git/contrib/completion/](https://github.com/git/git/tree/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion)
 
-各ファイルでGitHubからURLを取得し、行頭にあるコメントに従い有効にする。
+各ファイルのコメントに導入方法が記述されているが、zshの場合はそれぞれの関係を把握するためにある程度スクリプトの内容を理解する必要があったので残しておく。
 
-### .git-prompt.sh
+### zshでの導入方法
 
-環境変数 `PS1` に `__git_ps1` を呼び出すことで、プロンプトにgitリポジトリのステータスを表示可能になる。
+補完を有効にするだけなら `git-completion.bash` 、 `git-completion.zsh` 2つのファイルを利用する。 `git-prompt.sh` はプロンプトへのブランチ表示など独立した機能を提供する。
 
-スクリプトをダウンロードする。
+zshで利用するためには `git-completion.bash` と `git-completion.zsh` ２つのファイルを同じディレクトリに配置する。`git-completion.zsh` はファイル名を変更しても良いが、 `git-completion.bash` は `git-completion.zsh` 内で参照されるためファイル名が一致している必要がある。
 
-```shell
-% wget -O ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-prompt.sh
-```
+自分の環境では `~/.zsh/functions` にダウンロードした。
 
-`~/.zshrc` に読み込み設定する。
+### git-completion.bash
 
-```shell
-source ~/.git-prompt.sh
-```
+サブコマンドやブランチ名などを補完するためのシェルスクリプト。
 
-### .git-completion.bash
-
-サブコマンドやブランチ名などを補完できる。
-zshの場合はさらにこのスクリプトを扱うためのラッパーである `git-completion.zsh` を利用する。
-スクリプトをダウンロードする。
+`~/.zsh/functions/git-completion.bash` にファイルをダウンロードする。(bashの場合はこのスクリプトを読み込むが、zshではラッパーを介して利用するためダウンロードのみで良い)
 
 ```shell
-% wget -O ~/.git-completion.bash https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-completion.bash
+% wget -O ~/.zsh/functions/git-completion.bash https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-completion.bash
 ```
-
-bashの場合はこのスクリプトを読み込むが、zshではラッパーを介して利用するためダウンロードのみで良い。
 
 ### git-completion.zsh
 
-zshでgitの補完を利用するためのラッパースクリプト。
+zshでgitの補完を有効にする処理が書かれた `git-completion.bash` のラッパースクリプト。zshの補完システムで利用されるモジュール。
 
-スクリプトのダウンロード。
+`~/.zsh/functions/_git` にファイルのダウンロードする。
 
 ```shell
-% wget -O ~/.zsh/_git https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-completion.zsh
+% wget -O ~/.zsh/functions/_git https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-completion.zsh
 ```
 
-`~/.zshrc` に読み込み設定を追加。
+`~/.zshrc` で `$fpath` にダウンロードしたスクリプトを追加する。
 
 ```shell
-zstyle ':completion:*:*:git:*' script ~/.git-completion.bash
-fpath=(${HOME}/.zsh ${fpath})
-autoload -Uz compinit && compinit
+fpath=(${HOME}/.zsh/functions ${fpath})
 ```
 
 ### 確認
@@ -169,11 +158,27 @@ push  -- update remote refs along with associated objects
 % git pull origin
 ```
 
+### git-prompt.sh
+
+環境変数 `PS1` に `__git_ps1` を呼び出すことで、プロンプトにgitリポジトリのステータスを表示可能になる。
+
+スクリプトをダウンロードする。
+
+```shell
+% wget -O ~/.git-prompt.sh https://raw.githubusercontent.com/git/git/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion/git-prompt.sh
+```
+
+`~/.zshrc` に読み込み設定する。
+
+```shell
+source ~/.git-prompt.sh
+```
+
 ## トラブルシュート
 
-### .git-completion.bashで `this script is obsolete, please see git-completion.zsh`
+### ~/.zshrc読み込み時に `this script is obsolete, please see git-completion.zsh` が出力される
 
-zshで `.git-completion.bash` を読み込んでいる場合に警告される。
+zshで `git-completion.bash` を読み込んでいる場合に警告される。
 
 - [`if [[ -n ${ZSH_VERSION-} && -z ${GIT_SOURCING_ZSH_COMPLETION-} ]]; then`](https://github.com/git/git/blob/7c2ef319c52c4997256f5807564523dfd4acdfc7/contrib/completion/git-completion.bash#L3561)
 
@@ -183,6 +188,29 @@ zshで `.git-completion.bash` を読み込んでいる場合に警告される�
 
 - [シェルの種類とバージョンの検出 - 拡張 POSIX シェルスクリプト Advent Calendar 2013](https://fumiyas.github.io/2013/12/04/name-ver-mode.sh-advent-calendar.html)
 
-## `git-completion.zsh` の設定をしたがブランチが補完されない
+## `git-completion.zsh` での `bash-completion.bash` について
 
-zshの補完設定に反映されていなかった。
+`git-completion.zsh` における `bash-completion.bash` を捜査する優先順位
+
+- 1. `:completion:*:*:git:*` のコンテキスにおける `script` の値
+- 2. `git-completion.zsh` が置かれているディレクトの `git-completion.bash`
+- 3. `$HOME/.local/share/bash-completion/completions/git`
+- 4. `$bash_completion/git`
+- 5. `/etc/bash_completion.d/git`
+
+今回は 2. で読み込まれる様にスクリプトを配置した。2.から6.に一致しないパスに `git-completion.bash` を配置した場合は、`script` スタイルにパスを設定すればいい。
+
+`git-completion.bash` を `~/.git-completion.bash` にダウンロードした場合は下の記述を `.zshrc` に追加する。
+
+```shell
+zstyle ':completion:*:*:git:*' script ~/.git-completion.bash
+fpath=(${HOME}/.zsh/functions ${fpath})
+```
+
+zshの補完システムは `$FPATH` に指定されたディレクトリに含まれるアンダースコア( `_` )で始まる関数を自動的に読み込む。
+
+## 参考
+
+- [git/contrib/completion/](https://github.com/git/git/tree/a68dfadae5e95c7f255cf38c9efdcbc2e36d1931/contrib/completion)
+- [zsh.sourceforge.io | 20 Completion System](https://zsh.sourceforge.io/Doc/Release/Completion-System.html)
+- [シェルの種類とバージョンの検出 - 拡張 POSIX シェルスクリプト Advent Calendar 2013](https://fumiyas.github.io/2013/12/04/name-ver-mode.sh-advent-calendar.html)
