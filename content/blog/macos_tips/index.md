@@ -76,3 +76,11 @@ Spotlight実行時の候補を減らすためにホワイトリストで管理�
 
 2つのアプリケーションを相互に行き来するような場合は `Cmd + Tab` でトグルする
 3つ以上のアプリケーションを操作する場合に `Cmd + Tab` は操作順を意識する必要があるので利用しない
+
+## Google Chrome
+
+[ショートカット一覧](https://support.google.com/chrome/answer/157179?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Ctab-window-shortcuts%2Cgoogle-chrome-feature-shortcuts%2Caddress-bar-shortcuts%2Cwebpage-shortcuts%2Cmouse-shortcuts)にないのでメモ
+
+|command|describe|
+|:--|:--|
+|command + option + ↓ or command + option + ↑|アドレスバーへのフォーカス、フォーカスの解除をトグルできる|
