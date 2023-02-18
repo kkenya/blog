@@ -1,5 +1,5 @@
 ---
-title: macOSで設定しているgitの設定について
+title: macOSのgitアップデートとプロンプト表示について
 # created: "2018-12-04T06:42:00.000Z"
 date: "2022-12-25T03:18:07.000Z"
 status: published
@@ -190,7 +190,7 @@ zshで `git-completion.bash` を読み込んでいる場合に警告される。
 
 ## `git-completion.zsh` での `bash-completion.bash` について
 
-`git-completion.zsh` における `bash-completion.bash` を捜査する優先順位
+`git-completion.zsh` における `bash-completion.bash` を走査する優先順位
 
 - 1. `:completion:*:*:git:*` のコンテキスにおける `script` の値
 - 2. `git-completion.zsh` が置かれているディレクトの `git-completion.bash`
