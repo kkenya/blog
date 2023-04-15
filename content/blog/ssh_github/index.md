@@ -30,10 +30,13 @@ ssh-keygen -t ed25519 -C "foo@example.test"
 生成された公開鍵をGitHubに登録する。
 
 ```shell
+# macOS
 pbcopy < ~/.ssh/id_ed25519_github.pub
+# wsl
+clip.exe < ~/.ssh/id_ed25519.github.pub
 ```
 
-GitHubの[Settings](https://github.com/settings/profile)から「SSH and GPG keys」を選択し公開鍵を貼り付ける。
+GitHubの[Settings](https://github.com/settings/profile)で「SSH and GPG keys」を選択し公開鍵を貼り付ける。
 
 
 sshコマンドに `-i` オプションで秘密鍵を指定して正しく公開鍵を設定できているか確認する。 このとき生成時に設定したパスフレーズを入力する。
