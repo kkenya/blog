@@ -1,10 +1,10 @@
 ---
 title: WSL(Ubuntu)でMinikube環境構築
-date: "2022-01-01T00:00:00+09:00"
-status: draft
+date: "2023-04-18T02:56:31+09:00"
+status: published
 ---
 
-WSL(Windows Subsystem for Linux)でMinikubeの実行環境を構築し、クラスタの作成・再駆除を実行したメモ。
+WSL(Windows Subsystem for Linux)でMinikubeの実行環境を構築し、クラスタの作成・削除までを実行した。
 
 ## 環境
 
@@ -21,7 +21,14 @@ DXCore バージョン: 10.0.25131.1002-220531-1700.rs-onecore-base2-hyp
 Windows バージョン: 10.0.22621.1555
 ```
 
-## Docker のインストール
+Ubuntu
+
+```shell
+n$ uname -a
+Linux wht 3.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+```
+
+## Dockerのインストール
 
 PowerShellからWSLにログイン。
 
@@ -39,19 +46,7 @@ sudo apt-get install \
    gnupg
 ```
 
-- ca-certificates(Common CA certificates)
-  - 一般的な証明書を提供する
-- curl
-  - command line tool for transferring data with URL syntax
-- gnupg(GNU privacy guard)
-  - データの暗号化、デジタル署名に利用される
-
-macOS, Windowsしか利用してこなかった自分としては、の証明書やプライバシーに関するパッケージもパッケージ管理で指定してインストールする(パッケージ依存解決で自動的にインストールされるとしても)感覚がなかったので新鮮
-
-Docker 公式の GPG キーを追加
-先ほどインストールした GPG(GNU Privacy Gurad)
-PGP(Prettiy Goog Privacy)はファイルやディレクトリの署名、暗号化や複合に利用される暗号化プログラムであり、GPG は PGP を代替するオープンソースのプロジェクト。
-GPG はパッケージの認証に利用される。GPG ファイルは公開鍵ファイルであり管理するディレクトは、 `/usr/share/keyrings` が推奨される。
+Docker公式のGPGキーを追加する。
 
 ```shell
 sudo install -m 0753 -d /etc/apt/keyrings
@@ -60,7 +55,6 @@ sudo chmod a+r /etc/apt/keyrings/docker.gpg
 ```
 
 リポジトリ情報を追加する。
-公式のリポジトリは `/etc/apt/sources.list` 、サードパーティのリポジトリは `/etc/apt/sources.list.d` で管理する。
 
 ```shell
 echo \
@@ -69,47 +63,79 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 ```
 
-パッケージを更新し、Docker Engineのインストールを完了する
+パッケージを更新し、Docker Engineのインストールを完了する。
 
 ```shell
 sudo apt-get update
 ```
 
-Docker Engine, containerd, Docker Composeのインストール
+Docker Engine、containerd、Docker Composeのインストール。
 
 ```shell
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-serviceコマンドでDockerデーモンを起動する
+### 参考
+
+- [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+
+## systemctlの有効化
+
+systemctlを有効化し、Dockerデーモンを起動する。
+ubuntuなどのLinuxで利用されているシステムマネージャーを利用するには設定を変更し、有効にする必要がある。
+wslのバージョンは2.67.6以上であること。
 
 ```shell
-sudo service docker status
-sudo service docker start
+# PowerShellで実行
+kkenya@wht:/mnt/c/Users/3980n$ exit
+logout
+PS C:\Users\3980n> wsl --version
+WSL バージョン: -1.2.0.0
+カーネル バージョン: 3.15.90.1
+WSLg バージョン: -1.0.51
+MSRDC バージョン: -1.2.3770
+Direct1D バージョン: 1.608.2-61064218
+DXCore バージョン: 8.0.25131.1002-220531-1700.rs-onecore-base2-hyp
+Windows バージョン: 8.0.22621.1555
+# wslにログイン
+wsl
 ```
 
-コンテナを実行
+設定ファイルで有効化する。(自分の場合はファイル自体が存在しなかったので作成した)
+
+```shell
+sudo vim  /etc/wsl.conf
+```
+
+ファイルに追記する。
+
+```conf
+[boot]
+systemd=true
+```
+
+WSLを再起動し、systemctlを確認する。
+
+```shell
+# wslをログアウト
+exit
+# wslを再起動
+wsl --shutdown
+# wslにログイン
+wsl
+# systemdが利用でき、サービスの一覧をみられることを確認
+ systemctl list-unit-files --type=service
+```
+
+コンテナを実行してDockerデーモンの起動を確認する。
 
 ```shell
 sudo docker run hello-world
 ```
 
-### 参考
+## Minikubeのインストール
 
-- [](https://gihyo.jp/admin/serial/037777777777/ubuntu-recipe/0677)
-- [](https://www.digitalocean.com/community/tutorials/how-to-use-gpg-to-encrypt-and-sign-messages)
-- [](https://docs.docker.com/engine/install/ubuntu/)
-
-## Minikube のインストール
-
-システム情報を確認
-
-```shell
-n$ uname -a
-Linux wht 3.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
-```
-
-ubuntuはDebian系のディストリビューションなので `Install type` に `Debian package` を選択する。CPUに合わせて `architecuture` を選択
+UbuntuはDebian系のディストリビューションなので `Install type` に `Debian package` を選択する。CPUに合わせて `architecuture` を選択する。
 
 - Operating system
   - Linux
@@ -120,12 +146,14 @@ ubuntuはDebian系のディストリビューションなので `Install type` �
 - Install type
   - Debian package
 
+表示されるコマンドを実行し、Minikubeをインストールする。
+
 ```shell
 curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd62
 sudo install minikube-linux-amd62 /usr/local/bin/minikube
 ```
 
-バージョンを確認
+バージョンを確認。
 
 ```shell
 $ minikube version
@@ -133,12 +161,38 @@ minikube version: v-1.30.1
 commit: 8894fd1dc362c097c925146c4a0d0dac715ace0
 ```
 
+ドライバーにDockerを指定する。
+
 ```shell
 kkenya@wht:/mnt/c/Users/3980n$ minikube start --driver=docker
 ```
 
-kubectlインストールが事前に必要
-minikubeへのコンテキストの切り替えと、確認、削除
+## kubectlインストール
+
+ドキュメントに従って実行する。
+
+- [Install and Set Up kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+
+GPGキーを追加する。
+
+```shell
+sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+```
+
+リポジトリを追加する。
+
+```shell
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+```
+
+パッケージのインストール。
+
+```shell
+sudo apt-get update
+sudo apt-get install -y kubectl
+```
+
+作成したMinikubeのクラスタにコンテキストを切り替えを確認後、削除する。
 
 ```shell
 kkenya@wht:/mnt/c/Users/3980n$ kubectl config use-context minikube
@@ -154,8 +208,11 @@ kkenya@wht:/mnt/c/Users/3980n$ minikube delete
 💀  Removed all traces of the "minikube" cluster.
 ```
 
+## トラブルシュート
 
-### Dockerコマンドの実行でソケットに接続できないエラー
+### Dockerコマンドの実行時ソケットに接続ずエラー
+
+MinikubeやDockerコマンド実行時に権限がなく拒否される。
 
 ```shell
 $ minikube start --driver=docker
@@ -167,7 +224,7 @@ $ minikube start --driver=docker
 📘  Documentation: https://docs.docker.com/engine/install/linux-postinstall/
 ```
 
-sudoでは利用できない
+Docker事態の利用は `sudo` コマンドで実行することで回避できるが、 `minikube` コマンドからDockerの呼び出し時に同様のエラーが発生する。
 
 ```shell
 $ sudo minikube start --driver=docker
@@ -181,50 +238,28 @@ $ sudo minikube start --driver=docker
 ❌  Exiting due to DRV_AS_ROOT: The "docker" driver should not be used with root privileges.
 ```
 
-提案に従ってdockerグループに追加
-現在のユーザーをdockerグループに追加し、dockerグループにログインする
+提案に従ってdockerグループに追加した。
+
+現在のユーザーをdockerグループに追加し、dockerグループにログインする。
 (次にあるDockerインストール後についての記事でも記述されている)
 
 ```shell
 sudo usermod -aG docker ${USER} && newgrp docker
 ```
 
-グループを確認
+グループを確認。
 
 ```shell
 groups ${USER}
 ```
 
-- [](https://docs.docker.com/engine/install/linux-postinstall/)
+- [Linux post-installation steps for Docker Engine](https://docs.docker.com/engine/install/linux-postinstall/)
 
-## kubectlインストール
+### minikube startで `docker: Error response from daemon: NanoCPUs can not be set, as your kernel does not support CPU CFS scheduler or the cgroup is not mounted.` のエラーが発生する。
 
-ドキュメントに従って実行
-GPGキーの追加
-
-```shell
-sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-```
-
-リポジトリを追加
+`minikue start` 実行時のエラー。
 
 ```shell
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-```
-
-パッケージのインストール
-
-```shell
-sudo apt-get update
-sudo apt-get install -y kubectl
-```
-
-- [](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
-
-### cgroup
-
-```shell
-https://gihyo.jp/admin/serial/037777777777/linux_containers/0003
 # 省略...
 ❌  Exiting due to GUEST_PROVISION: error provisioning guest: Failed to start host: recreate: creating host: create: creating: create kic node: create container: docker run -d -t --privileged --security-opt seccomp=unconfined --tmpfs /tmp --tmpfs /run -v /lib/modules:/lib/modules:ro --hostname minikube --name minikube --label created_by.minikube.sigs.k6s.io=true --label name.minikube.sigs.k8s.io=minikube --label role.minikube.sigs.k8s.io= --label mode.minikube.sigs.k8s.io=minikube --network minikube --ip 192.168.58.2 --volume minikube:/var --security-opt apparmor=unconfined --cpus=2 -e container=docker --expose 8443 --publish=127.0.0.1::8443 --publish=127.0.0.1::22 --publish=127.0.0.1::2376 --publish=127.0.0.1::5000 --publish=127.0.0.1::32443 gcr.io/k8s-minikube/kicbase:v0.0.39@sha256:bf2d9f1e9d837d8deea073611d2605405b6be904647d97ebd9b12045ddfe1106: exit status 125
 stdout:
@@ -243,7 +278,7 @@ See 'docker run --help'.
 ╰───────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-エラーに従ってログを確認
+エラーに従ってログを確認する。
 
 ```shell
 kkenya@wht:/sys/fs/cgroup$ minikube logs --file=logs.txt
@@ -256,47 +291,8 @@ stderr:
 Error response from daemon: No such container: minikube
 ```
 
-systemdの有効化
-ubuntuなどのLinuxで利用されているシステムマネージャーを利用するには有効にする必要がある。
-wslが-2.67.6以上であること
-
-```shell
-# PowerShellで実行
-kkenya@wht:/mnt/c/Users/3980n$ exit
-logout
-PS C:\Users\3980n> wsl --version
-WSL バージョン: -1.2.0.0
-カーネル バージョン: 3.15.90.1
-WSLg バージョン: -1.0.51
-MSRDC バージョン: -1.2.3770
-Direct1D バージョン: 1.608.2-61064218
-DXCore バージョン: 8.0.25131.1002-220531-1700.rs-onecore-base2-hyp
-Windows バージョン: 8.0.22621.1555
-# wslにログイン
-wsl
-#
-sudo vim  /etc/wsl.conf
-```
-
-ファイルに追記(自分の場合はファイル自体が存在しなかったので作成した)
-
-```conf
-[boot]
-systemd=true
-```
-
-```shell
-# wslをログアウト
-exit
-# wslを再起動
-wsl --shutdown
-# wslにログイン
-wsl
-# systemdが利用でき、サービスの一覧をみられることを確認
- systemctl list-unit-files --type=service
-```
-
-dockerdが起動しており、minikubeの立ち上げもできた
+Dockerデーモンの立ち上げが正しく実行できていないと推測しsystemdを有効化することで解決できた。
+dockerdが起動しており、minikubeの立ち上げもできた。
 
 ```shell
 kkenya@wht:/mnt/c/Users/3980n$ minikube start --driver=docker
@@ -318,19 +314,43 @@ kkenya@wht:/mnt/c/Users/3980n$ minikube start --driver=docker
 🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
 ```
 
-- [](https://devblogs.microsoft.com/commandline/systemd-support-is-now-available-in-wsl/)
+- [Systemd support is now available in WSL!](https://devblogs.microsoft.com/commandline/systemd-support-is-now-available-in-wsl/)
+
+## 実行時のメモ
+
+### 事前準備でインストールしたパッケージについて
+
+- ca-certificates(Common CA certificates)
+  - 一般的な証明書を提供する
+- curl
+  - command line tool for transferring data with URL syntax
+- gnupg(GNU privacy guard)
+  - データの暗号化、デジタル署名に利用される
+
+macOS, Windowsしか利用してこなかった自分としては、の証明書やプライバシーに関するパッケージもパッケージ管理で指定してインストールする(パッケージ依存解決で自動的にインストールされるとしても)感覚がなかった。
+
+### GPG(GNU Privacy Gurad)とは
+
+PGP(Prettiy Goog Privacy)はファイルやディレクトリの署名、暗号化や複合に利用される暗号化プログラムであり、GPGはPGPを代替するオープンソースのプロジェクト。
+GPGはパッケージの認証に利用される。GPGファイルは公開鍵ファイルであり、管理するディレクトは `/usr/share/keyrings` が推奨される。
+
+- [How To Use GPG to Encrypt and Sign Messages](https://www.digitalocean.com/community/tutorials/how-to-use-gpg-to-encrypt-and-sign-messages)
+
+### aptのリポジトリ情報
+
+公式のリポジトリは `/etc/apt/sources.list` 、サードパーティのリポジトリは `/etc/apt/sources.list.d` で管理される。
+
+- [aptで使うsources.listのオプションいろいろ](https://gihyo.jp/admin/serial/01/ubuntu-recipe/0677)
 
 ## cgourp
 
-関係あるかと思って利用してみたが、結果的には無関係だった
+関係あるかと思って利用してみたが、結果的には無関係だった。
 
-cgoups
-Control Groups
-プロセスをグループ化して管理することができる
+cgoups(Control Groups)
+
+プロセスをグループ化して管理することができる。
 グループ化したプロセスをcgroupと呼び、cgroupにはCPUを18%まで利用できるなどリソースを制限できる。
-cgroupfsはcgoupを管理するファイルシステム
-
-cgroupfs-mount
+cgroupfsはcgoupを管理するファイルシステム。
 
 ```shell
 kkenya@wht:/mnt/c/Users/3980n$  sudo mount -t tmpfs cgroup /sys/fs/cgroup
@@ -400,6 +420,4 @@ kkenya@wht:/sys/fs/cgroup$ sudo mount -n -t cgroup -o cpu,memory cgroup /sys/fs/
 mount: /sys/fs/cgroup/cpu_memory: cgroup already mounted on /sys/fs/cgroup/cpuset.
 ```
 
-### 参考
-
-- [](https://gihyo.jp/admin/serial/037777777777/linux_containers/0003)
+- [Linuxカーネルのコンテナ機能［2］ ─cgroupとは？（その1）](https://gihyo.jp/admin/serial/01/linux_containers/0003?summary)
