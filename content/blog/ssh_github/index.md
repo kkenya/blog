@@ -56,7 +56,7 @@ ssh-agentを起動する。
 eval "$(ssh-agent -s)"
 ```
 
-sshごとにパスフレーズの入力が必要ないようkeychainに保存する。
+macOSならsshごとにパスフレーズの入力が必要ないようkeychainに保存する。
 
 ```shell
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_github
@@ -74,6 +74,36 @@ Identity added: /home/username/.ssh/id_ed25519.github (user@example.test)
 $ ssh -T git@github.com
 Hi kkenya! You've successfully authenticated, but GitHub does not provide shell access.
 ```
+
+PCを再起動するなどsshエージェントを起動するたびに再度パスフレーズを保存する必要があるため、シェル起動時にsshエージェントを起動するシェルスクリプトを実行する。
+
+GitHubの[ドキュメント](https://docs.github.com/ja/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases)を参考に `~/.profile` に追加する。
+
+```shell
+env=~/.ssh/agent.env
+
+agent_load_env () { test -f "$env" && . "$env" >| /dev/null ; }
+
+agent_start () {
+    (umask 077; ssh-agent >| "$env")
+    . "$env" >| /dev/null ; }
+
+agent_load_env
+
+# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
+agent_run_state=$(ssh-add -l >| /dev/null 2>&1; echo $?)
+
+if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
+    agent_start
+    ssh-add -i ~/.ssh/id_ed25519.github # デフォルトのキー名でないので明示的に指定する
+elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
+    ssh-add -i ~/.ssh/id_ed25519.github # デフォルトのキー名でないので明示的に指定する
+fi
+
+unset env
+```
+
+シェルを立ち上げるとキーフレーズの入力を求められるようになる。
 
 ## 参考
 
