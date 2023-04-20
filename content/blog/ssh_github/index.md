@@ -1,10 +1,10 @@
 ---
-title: GitHubのsshを設定する
+title: GitHubへのsshを設定する
 date: "2022-12-03T01:07:42+09:00"
 status: published
 ---
 
-GitHubへの接続のためsshキーの生成から登録を行う。
+GitHubへのSSH接続のためキーペアの生成から登録を行う。
 基本的にはGitHubの[ドキュメント](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)に従う。
 
 ## 環境
@@ -36,8 +36,7 @@ pbcopy < ~/.ssh/id_ed25519_github.pub
 clip.exe < ~/.ssh/id_ed25519.github.pub
 ```
 
-GitHubの[Settings](https://github.com/settings/profile)で「SSH and GPG keys」を選択し公開鍵を貼り付ける。
-
+GitHubの[Settings](https://github.com/settings/profile)で「SSH and GPG keys」を選択し公開鍵を貼り付けて保存。
 
 sshコマンドに `-i` オプションで秘密鍵を指定して正しく公開鍵を設定できているか確認する。 このとき生成時に設定したパスフレーズを入力する。
 
@@ -49,14 +48,7 @@ Hi kkenya! You've successfully authenticated, but GitHub does not provide shell 
 
 ## パスフレーズの保存
 
-`.ssh/config` を編集し次の値を追加する。
-
-```txt
-Host *.github.com
-  AddKeysToAgent yes
-  UseKeychain yes
-  IdentityFile ~/.ssh/id_ed25519_github
-```
+sshエージェントにパスフレーズを保存し、SSH接続事の入力を不要にする。
 
 ssh-agentを起動する。
 
@@ -68,6 +60,12 @@ sshごとにパスフレーズの入力が必要ないようkeychainに保存す
 
 ```shell
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519_github
+$ eval "$(ssh-agent -s)"
+Agent pid 262448
+# パスフレーズの入力を求められる
+$ ssh-add ~/.ssh/id_ed25519.github
+Enter passphrase for /home/kkenya/.ssh/id_ed25519.github:
+Identity added: /home/username/.ssh/id_ed25519.github (user@example.test)
 ```
 
 パスフレーズを正しく入力できていればテストに成功する。
