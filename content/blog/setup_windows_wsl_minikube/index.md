@@ -87,7 +87,7 @@ wslのバージョンは2.67.6以上であること。
 
 ```shell
 # PowerShellで実行
-kkenya@wht:/mnt/c/Users/3980n$ exit
+username@wht:/mnt/c/Users/username$ exit
 logout
 PS C:\Users\3980n> wsl --version
 WSL バージョン: -1.2.0.0
@@ -164,7 +164,7 @@ commit: 8894fd1dc362c097c925146c4a0d0dac715ace0
 ドライバーにDockerを指定する。
 
 ```shell
-kkenya@wht:/mnt/c/Users/3980n$ minikube start --driver=docker
+username@wht:/mnt/c/Users/username$ minikube start --driver=docker
 ```
 
 ## kubectlインストール
@@ -195,16 +195,16 @@ sudo apt-get install -y kubectl
 作成したMinikubeのクラスタにコンテキストを切り替えを確認後、削除する。
 
 ```shell
-kkenya@wht:/mnt/c/Users/3980n$ kubectl config use-context minikube
+username@wht:/mnt/c/Users/username$ kubectl config use-context minikube
 Switched to context "minikube".
-kkenya@wht:/mnt/c/Users/3980n$
-kkenya@wht:/mnt/c/Users/3980n$ kubectl get nodes
+username@wht:/mnt/c/Users/username$
+username@wht:/mnt/c/Users/username$ kubectl get nodes
 NAME       STATUS   ROLES           AGE   VERSION
 minikube   Ready    control-plane   12m   v1.26.3
-kkenya@wht:/mnt/c/Users/3980n$ minikube delete
+username@wht:/mnt/c/Users/username$ minikube delete
 🔥  Deleting "minikube" in docker ...
 🔥  Deleting container "minikube" ...
-🔥  Removing /home/kkenya/.minikube/machines/minikube ...
+🔥  Removing /home/username/.minikube/machines/minikube ...
 💀  Removed all traces of the "minikube" cluster.
 ```
 
@@ -228,7 +228,7 @@ Docker事態の利用は `sudo` コマンドで実行することで回避でき
 
 ```shell
 $ sudo minikube start --driver=docker
-[sudo] password for kkenya:
+[sudo] password for username:
 😄  minikube v-1.30.1 on Ubuntu 22.04 (amd64)
 ✨  Using the docker driver based on user configuration
 🛑  The "docker" driver should not be used with root privileges. If you wish to continue as root, use --force.
@@ -281,7 +281,7 @@ See 'docker run --help'.
 エラーに従ってログを確認する。
 
 ```shell
-kkenya@wht:/sys/fs/cgroup$ minikube logs --file=logs.txt
+username@wht:/sys/fs/cgroup$ minikube logs --file=logs.txt
 
 ❌  Exiting due to GUEST_STATUS: Unable to get machine status: state: unknown state "minikube": docker container inspect minikube --format=: exit status -1
 stdout:
@@ -295,7 +295,7 @@ Dockerデーモンの立ち上げが正しく実行できていないと推測�
 dockerdが起動しており、minikubeの立ち上げもできた。
 
 ```shell
-kkenya@wht:/mnt/c/Users/3980n$ minikube start --driver=docker
+username@wht:/mnt/c/Users/username$ minikube start --driver=docker
 😄  minikube v-1.30.1 on Ubuntu 22.04 (amd64)
 ✨  Using the docker driver based on existing profile
 👍  Starting control plane node minikube in cluster minikube
@@ -353,48 +353,48 @@ cgoups(Control Groups)
 cgroupfsはcgoupを管理するファイルシステム。
 
 ```shell
-kkenya@wht:/mnt/c/Users/3980n$  sudo mount -t tmpfs cgroup /sys/fs/cgroup
-kkenya@wht:/mnt/c/Users/3980n$ sudo mkdir /sys/fs/cgroup/cpu
+username@wht:/mnt/c/Users/username$  sudo mount -t tmpfs cgroup /sys/fs/cgroup
+username@wht:/mnt/c/Users/username$ sudo mkdir /sys/fs/cgroup/cpu
 # cpuサブシステムをマウント
-kkenya@wht:/mnt/c/Users/3980n$ sudo mount -t cgroup -o cpu cgroup /sys/fs/cgroup/cpu
-kkenya@wht:/mnt/c/Users/3980n$ ls /sys/fs/cgroup/cpu
+username@wht:/mnt/c/Users/username$ sudo mount -t cgroup -o cpu cgroup /sys/fs/cgroup/cpu
+username@wht:/mnt/c/Users/username$ ls /sys/fs/cgroup/cpu
 # ファイルを確認
 cgroup.clone_children  cgroup.sane_behavior  cpu.cfs_period_us  cpu.idle          cpu.rt_runtime_us  cpu.stat           release_agent
 cgroup.procs           cpu.cfs_burst_us      cpu.cfs_quota_us   cpu.rt_period_us  cpu.shares         notify_on_release  tasks
-kkenya@wht:/mnt/c/Users/3980n$ cd /sys/fs/cgroup/cpu
+username@wht:/mnt/c/Users/username$ cd /sys/fs/cgroup/cpu
 $  sudo mkdir test037777777777
-kkenya@wht:/sys/fs/cgroup/cpu$ ls -F
+username@wht:/sys/fs/cgroup/cpu$ ls -F
 cgroup.clone_children  cgroup.sane_behavior  cpu.cfs_period_us  cpu.idle          cpu.rt_runtime_us  cpu.stat           release_agent  test037777777777/
 cgroup.procs           cpu.cfs_burst_us      cpu.cfs_quota_us   cpu.rt_period_us  cpu.shares         notify_on_release  tasks
 # 作成したディレクトリ配下にファイルが存在することを確認
-kkenya@wht:/sys/fs/cgroup/cpu$ ls test037777777777/
+username@wht:/sys/fs/cgroup/cpu$ ls test037777777777/
 cgroup.clone_children  cgroup.procs  cpu.cfs_burst_us  cpu.cfs_period_us  cpu.cfs_quota_us  cpu.idle  cpu.rt_period_us  cpu.rt_runtime_us  cpu.shares  cpu.stat  notify_on_release  tasks
 # 何も存在しない
-kkenya@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test037777777777/tasks
+username@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test037777777777/tasks
 # 現在のプロセス番号を書き込み
-kkenya@wht:/sys/fs/cgroup/cpu$ echo $$ | sudo tee -a /sys/fs/cgroup/cpu/test037777777777/tasks
+username@wht:/sys/fs/cgroup/cpu$ echo $$ | sudo tee -a /sys/fs/cgroup/cpu/test037777777777/tasks
 2581
 # 現在のプロセスとcatコマンドのプロセスが書き込まれている
-kkenya@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test037777777777/tasks
+username@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test037777777777/tasks
 2581
 6697
 # 別のディレクトリを作成
-kkenya@wht:/sys/fs/cgroup/cpu$ sudo mkdir test00
-kkenya@wht:/sys/fs/cgroup/cpu$ echo $$ | sudo tee -a /sys/fs/cgroup/cpu/test00/tasks
+username@wht:/sys/fs/cgroup/cpu$ sudo mkdir test00
+username@wht:/sys/fs/cgroup/cpu$ echo $$ | sudo tee -a /sys/fs/cgroup/cpu/test00/tasks
 2581
-kkenya@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test00/tasks
+username@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test00/tasks
 2581
 6711
 # test00に現在のプロセスを書き込んだため、test01には存在しない
-kkenya@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test037777777777/tasks
+username@wht:/sys/fs/cgroup/cpu$ cat /sys/fs/cgroup/cpu/test037777777777/tasks
 # 利用中のcgroupは削除できない
-kkenya@wht:/sys/fs/cgroup/cpu$ sudo rmdir /sys/fs/cgroup/cpu/test00
+username@wht:/sys/fs/cgroup/cpu$ sudo rmdir /sys/fs/cgroup/cpu/test00
 rmdir: failed to remove '/sys/fs/cgroup/cpu/test00': Device or resource busy
-kkenya@wht:/sys/fs/cgroup/cpu$ sudo rmdir /sys/fs/cgroup/cpu/test037777777777
-kkenya@wht:/sys/fs/cgroup/cpu$ ls /sys/fs/cgroup/cpu/test037777777777
+username@wht:/sys/fs/cgroup/cpu$ sudo rmdir /sys/fs/cgroup/cpu/test037777777777
+username@wht:/sys/fs/cgroup/cpu$ ls /sys/fs/cgroup/cpu/test037777777777
 ls: cannot access '/sys/fs/cgroup/cpu/test037777777777': No such file or directory
 # マウントポイントを確認
-kkenya@wht:/sys/fs/cgroup/cpu$ cat tasks
+username@wht:/sys/fs/cgroup/cpu$ cat tasks
 -1
 2
 3
@@ -403,20 +403,20 @@ kkenya@wht:/sys/fs/cgroup/cpu$ cat tasks
 1732
 ...省略
 # マウントしたディレクトリは以下のディレクトリもcgroupに所属する
-kkenya@wht:/sys/fs/cgroup/cpu$ sudo mkdir test00/test03
-kkenya@wht:/sys/fs/cgroup/cpu$ ls test00/test03/
+username@wht:/sys/fs/cgroup/cpu$ sudo mkdir test00/test03
+username@wht:/sys/fs/cgroup/cpu$ ls test00/test03/
 cgroup.clone_children  cgroup.procs  cpu.cfs_burst_us  cpu.cfs_period_us  cpu.cfs_quota_us  cpu.idle  cpu.rt_period_us  cpu.rt_runtime_us  cpu.shares  cpu.stat  notify_on_release  tasks
 # cpuとmemoryをアンマウント
-kkenya@wht:/sys/fs/cgroup$ sudo umount /sys/fs/cgroup/cpu
-kkenya@wht:/sys/fs/cgroup$ sudo umount /sys/fs/cgroup/memory
+username@wht:/sys/fs/cgroup$ sudo umount /sys/fs/cgroup/cpu
+username@wht:/sys/fs/cgroup$ sudo umount /sys/fs/cgroup/memory
 # アンマウントしたのでファイルが存在しない
-kkenya@wht:/sys/fs/cgroup$ ll cpu/
+username@wht:/sys/fs/cgroup$ ll cpu/
 total -2
 drwxr-xr-x 0 root root 40 Apr 15 20:52 ./
 drwxrwxrwt 2 root root 80 Apr 15 23:25 ../
 # cpuとmemoryを同時の一つのマウントポイントにマウント
-kkenya@wht:/sys/fs/cgroup$ sudo mkdir /sys/fs/cgroup/cpu_memory
-kkenya@wht:/sys/fs/cgroup$ sudo mount -n -t cgroup -o cpu,memory cgroup /sys/fs/cgroup/cpu_memory
+username@wht:/sys/fs/cgroup$ sudo mkdir /sys/fs/cgroup/cpu_memory
+username@wht:/sys/fs/cgroup$ sudo mount -n -t cgroup -o cpu,memory cgroup /sys/fs/cgroup/cpu_memory
 mount: /sys/fs/cgroup/cpu_memory: cgroup already mounted on /sys/fs/cgroup/cpuset.
 ```
 

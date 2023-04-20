@@ -1,8 +1,9 @@
 ---
-title: 
+title: WSL環境構築
 date: "2023-04-15T12:00:00+09:00"
 status: draft
 ---
+
 winget の利用
 
 ## winget とは
@@ -20,7 +21,7 @@ GitHub アカウントで設定同期
 
 ## wsl
 
-PowerShell で実行
+PowerShellで実行する。
 
 ```shell
 wsl --install
