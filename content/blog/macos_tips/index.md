@@ -1,10 +1,10 @@
 ---
 title: mac操作効率化のためにしていること
 date: "2022-03-13T00:39:23+09:00"
-status: draft
+status: published
 ---
 
-mac操作を効率化するために自分が普段からしていることをまとめてみた
+mac操作の設定をまとめてみた。
 
 ## macの設定・操作
 
@@ -43,7 +43,7 @@ vscodeなど一つのアプリケーションで複数のウィンドウを開�
 
 #### 検索結果
 
-余分な検索結果を取得しないよう `アプリケーション` と `計算機` のみ有効
+アプリケーションの切り替えと簡単な計算にしか利用しないので `アプリケーション` と `計算機` を除いて無効にする。
 
 #### プライバシー
 
@@ -77,33 +77,10 @@ Spotlight実行時の候補を減らすためにホワイトリストで管理�
 2つのアプリケーションを相互に行き来するような場合は `Cmd + Tab` でトグルする
 3つ以上のアプリケーションを操作する場合に `Cmd + Tab` は操作順を意識する必要があるので利用しない
 
-## vscode
+## Google Chrome
 
-基本的にvimのプラグインを有効にしてhjklで移動
-todo: 別でまとめる
-
-### sidebar
+[ショートカット一覧](https://support.google.com/chrome/answer/157179?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Ctab-window-shortcuts%2Cgoogle-chrome-feature-shortcuts%2Caddress-bar-shortcuts%2Cwebpage-shortcuts%2Cmouse-shortcuts)にないのでメモ
 
 |command|describe|
 |:--|:--|
-|Cmd + Shift + E|EXPLORER|
-|Cmd + Shift + D|デバッグ画面|
-|Cmd + Shift + X|拡張機能|
-|Cmd + j|TERMINALの表示・非表示を切り替え|
-
-### terminal
-
-|Ctrl + `|TERMINALの表示・非表示を切り替え|
-|Shift + Cmd + U|OUTPUTの表示・非表示を切り替え|
-
-### Markdown
-
-|command|describe|
-|:--|:--|
-|Ctrl + w + v|previewを開く|
-
-## Chrome
-
-## tmux 
-
-を別でまとめる
+|command + option + ↓ or command + option + ↑|アドレスバーへのフォーカス、フォーカスの解除をトグルできる|
