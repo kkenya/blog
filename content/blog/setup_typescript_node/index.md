@@ -32,6 +32,7 @@ npx tsc --init
 |[target](https://www.typescriptlang.org/tsconfig#target)|TypeScriptをトランスパイルした結果出力されるJavaScriptのバージョンを定義|
 |[lib](https://www.typescriptlang.org/tsconfig#lib)|built-inで利用できるAPIの型定義を指定|
 |[outDir](https://www.typescriptlang.org/tsconfig)|トランスパイル結果の出力先|
+|[include](https://www.typescriptlang.org/tsconfig#include)|ソースコードを指定|
 
 TypeScriptの型の恩恵を十分に活用するために `noImplicit` 系統を有効化
 
@@ -93,11 +94,9 @@ index 5679481..0c1f40c 100644
 +    "exactOptionalPropertyTypes": true,               /* Interpret optional property types as written, rather than adding 'undefined'. */
 +    "noImplicitReturns": true,                        /* Enable error reporting for codepaths that do not explicitly return in a function. */
 +    "noFallthroughCasesInSwitch": true,               /* Enable error reporting for fallthrough cases in switch statements. */
-+    "noUncheckedIndexedAccess": true,                 /* Include 'undefined' in index signature results */
-+    "noImplicitOverride": true,                       /* Ensure overriding members in derived classes are marked with an override modifier. */
-+    "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type */
-     // "allowUnusedLabels": true,                        /* Disable error reporting for unused labels. */
-     // "allowUnreachableCode": true,                     /* Disable error reporting for unreachable code. */
+-  }
++  },
++  "include": ["src/**/*"]
 ```
 
 .gitignoreにdist追加

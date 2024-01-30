@@ -70,3 +70,17 @@ update-alternatives: using /usr/bin/vim.basic to provide /usr/bin/editor (editor
 kkenya@wht:~/github.com/kkenya/blog$ ll /etc/alternatives/editor
 lrwxrwxrwx 1 root root 18 Apr 16 14:49 /etc/alternatives/editor -> /usr/bin/vim.basic*
 ```
+
+## gitブランチ表示
+
+## nvm
+
+[nvm](https://github.com/nvm-sh/nvm)のREADMEに従ってインストール
+スクリプトを実行して `~/.bashrc` にスニペットが書き込まれていることを確認する。
+
+```shell
+# 最新のLTSをインストール
+nvm install --lts
+# バージョン確認
+node -v
+```
