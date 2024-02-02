@@ -28,9 +28,17 @@ n$ uname -a
 Linux wht 3.15.90.1-microsoft-standard-WSL2 #1 SMP Fri Jan 27 02:56:13 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
+## Docker
+
+コンテナランタイムにはDockerを利用する。
+
 ## Dockerのインストール
 
-PowerShellからWSLにログイン。
+次のドキュメントを参考にインストールした。
+
+- [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+
+ターミナルからWSLにログイン。
 
 ```shell
 wsl
@@ -75,11 +83,7 @@ Docker Engine、containerd、Docker Composeのインストール。
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
-### 参考
-
-- [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
-
-## systemctlの有効化
+### systemctlの有効化
 
 systemctlを有効化し、Dockerデーモンを起動する。
 ubuntuなどのLinuxで利用されているシステムマネージャーを利用するには設定を変更し、有効にする必要がある。
@@ -127,13 +131,19 @@ wsl
  systemctl list-unit-files --type=service
 ```
 
-コンテナを実行してDockerデーモンの起動を確認する。
+WSLでコンテナを実行してDockerデーモンの起動を確認する。
 
 ```shell
 sudo docker run hello-world
 ```
 
-## Minikubeのインストール
+## Minikube
+
+> Minikubeは、ローカルマシン上にVMを作成し、1つのノードのみを含む単純なクラスターをデプロイする軽量なKubernetes実装です。
+
+### Minikubeのインストール
+
+公式の[ドキュメント](https://minikube.sigs.k8s.io/docs/start/)に従ってインストールする。
 
 UbuntuはDebian系のディストリビューションなので `Install type` に `Debian package` を選択する。CPUに合わせて `architecuture` を選択する。
 
@@ -161,13 +171,17 @@ minikube version: v-1.30.1
 commit: 8894fd1dc362c097c925146c4a0d0dac715ace0
 ```
 
-ドライバーにDockerを指定する。
+クラスターを作成する。
 
 ```shell
-username@wht:/mnt/c/Users/username$ minikube start --driver=docker
+username@wht:/mnt/c/Users/username$ minikube start
 ```
 
-## kubectlインストール
+## Kubectl
+
+> Kubernetesが提供する、 kubernetes APIを使用してKubernetesクラスターのコントロールプレーンと通信するためのコマンドラインツールです。
+
+### kubectlインストール
 
 ドキュメントに従って実行する。
 
@@ -192,20 +206,51 @@ sudo apt-get update
 sudo apt-get install -y kubectl
 ```
 
-作成したMinikubeのクラスタにコンテキストを切り替えを確認後、削除する。
+## Minikubeの実行
+
+作成したMinikubeのクラスタへコンテキストの切り替える。
 
 ```shell
 username@wht:/mnt/c/Users/username$ kubectl config use-context minikube
 Switched to context "minikube".
-username@wht:/mnt/c/Users/username$
-username@wht:/mnt/c/Users/username$ kubectl get nodes
-NAME       STATUS   ROLES           AGE   VERSION
-minikube   Ready    control-plane   12m   v1.26.3
-username@wht:/mnt/c/Users/username$ minikube delete
-🔥  Deleting "minikube" in docker ...
-🔥  Deleting container "minikube" ...
-🔥  Removing /home/username/.minikube/machines/minikube ...
-💀  Removed all traces of the "minikube" cluster.
+```
+
+サンプルアプリケーションをデプロイする。
+
+```shell
+username@wht:~/github.com/username/blog$ kubectl create deployment hello-minikube --image=kicbase/echo-ser
+ver:1.0
+deployment.apps/hello-minikube created
+username@wht:~/github.com/username/blog$ kubectl expose depolyment hello-minikube --type=NodePort --port=8
+080
+error: the server doesn't have a resource type "depolyment"
+username@wht:~/github.com/username/blog$ kubectl expose deployment hello-minikube --type=NodePort --port=8
+080
+service/hello-minikube exposed
+username@wht:~/github.com/username/blog$
+username@wht:~/github.com/username/blog$ minikube service hello-minikube
+|-----------|----------------|-------------|---------------------------|
+| NAMESPACE |      NAME      | TARGET PORT |            URL            |
+|-----------|----------------|-------------|---------------------------|
+| default   | hello-minikube |        8080 | http://192.168.49.2:31148 |
+|-----------|----------------|-------------|---------------------------|
+🏃  Starting tunnel for service hello-minikube.
+|-----------|----------------|-------------|------------------------|
+| NAMESPACE |      NAME      | TARGET PORT |          URL           |
+|-----------|----------------|-------------|------------------------|
+| default   | hello-minikube |             | http://127.0.0.1:36521 |
+|-----------|----------------|-------------|------------------------|
+🎉  Opening service default/hello-minikube in default browser...
+👉  http://127.0.0.1:36521
+❗  Because you are using a Docker driver on linux, the terminal needs to be open to run it.
+```
+
+ブラウザで実行時に表示されたアドレスにアクセスする。今回は `http://127.0.0.1:36521` 。
+
+確認完了後、クラスターを削除する。
+
+```shell
+minikube delete
 ```
 
 ## トラブルシュート
@@ -224,7 +269,7 @@ $ minikube start --driver=docker
 📘  Documentation: https://docs.docker.com/engine/install/linux-postinstall/
 ```
 
-Docker事態の利用は `sudo` コマンドで実行することで回避できるが、 `minikube` コマンドからDockerの呼び出し時に同様のエラーが発生する。
+Docker自体の利用は `sudo` コマンドで実行することで回避できるが、 `minikube` コマンドからDockerの呼び出し時に同様のエラーが発生する。
 
 ```shell
 $ sudo minikube start --driver=docker

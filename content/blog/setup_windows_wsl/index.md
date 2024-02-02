@@ -9,20 +9,39 @@ winget の利用
 ## winget とは
 
 Microsoft の提供するパッケージマネージャー
+`winget` コマンドを利用してパッケージの検索やインストールが可能
 
-https://learn.microsoft.com/ja-jp/windows/package-manager/
+- [Windows パッケージ マネージャー](https://learn.microsoft.com/ja-jp/windows/package-manager/)
 
-## vscode
+## Windowns Terminal
 
+ターミナルにはMicrosoftの提供するWindow Terminialを利用する。
+
+- [Windows ターミナルとは](https://learn.microsoft.com/ja-jp/windows/terminal/)
+
+```shell
+winget search terminal
+winget install --name Windows Terminal
+```
+
+## Visual Studio Code
+
+wingetでのインストール
+
+```shell
+# Visual Studio Codeの検索
 winget search vscode
+# インストール
 winget install vscode
+```
 
-GitHub アカウントで設定同期
+GitHub アカウントで設定を同期し、拡張機能をインストールする
 
-## wsl
+## Windows Subsystem for Linux
 
-PowerShellで実行する。
+- [WSL 開発環境を設定する](https://learn.microsoft.com/ja-jp/windows/wsl/setup/environment)
 
+WSLのインストール
 ```shell
 wsl --install
 ```
@@ -30,8 +49,6 @@ wsl --install
 インストール後、案内に従いコンピューターを再起動する
 
 ubuntu を選択し、実行するとユーザー名とパスワードを設定する
-
-- [WSL 開発環境を設定する](https://learn.microsoft.com/ja-jp/windows/wsl/setup/environment)
 
 バージョン確認
 
@@ -43,7 +60,7 @@ PS C:\Users\3980n> wsl --list --verbose
 
 ## エディタの変更
 
-gitのコミット時などに標準で選択されるエディタを `nano` から `vim	` に変更する
+gitのコミット時などに標準で選択されるエディタを `nano` から `vim` に変更する
 
 ```shell
 # 環境変数VISUAL,EDIOTRが設定されていなければ利用される
@@ -75,8 +92,8 @@ lrwxrwxrwx 1 root root 18 Apr 16 14:49 /etc/alternatives/editor -> /usr/bin/vim.
 
 ## nvm
 
-[nvm](https://github.com/nvm-sh/nvm)のREADMEに従ってインストール
-スクリプトを実行して `~/.bashrc` にスニペットが書き込まれていることを確認する。
+Nodejsのバージョン管理は `nvm` を利用する。
+[nvm](https://github.com/nvm-sh/nvm)のREADMEに従ってインストールし、スクリプトを実行して `~/.bashrc` にスニペットが書き込まれていることを確認する。
 
 ```shell
 # 最新のLTSをインストール
